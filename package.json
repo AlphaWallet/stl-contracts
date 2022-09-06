@@ -1,0 +1,14 @@
+{
+  "name": "stl-contracts",
+  "version": "1.0.0",
+  "description": "STL contracts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oleggrib/contracts.git"
+  },
+  "author": "STL",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oleggrib/contracts/issues"
+  }
+}

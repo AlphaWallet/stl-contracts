@@ -101,13 +101,11 @@ contract VerifyAttestation {
         }
     }
 
-    function verifyTicketAttestation(bytes memory attestation) public view returns(address attestor, address ticketIssuer, address subject, bytes memory ticketId, bytes memory conferenceId, bool attestationValid) //public pure returns(address payable subject, bytes memory ticketId, string memory identifier, address issuer, address attestor)
-    {
+    function verifyTicketAttestation(bytes memory attestation) public view returns(address attestor, address ticketIssuer, address subject, bytes memory ticketId, bytes memory conferenceId, bool attestationValid) {
         (attestor, ticketIssuer, subject, ticketId, conferenceId, attestationValid) = _verifyTicketAttestation(attestation);
     }
 
-    function _verifyTicketAttestation(bytes memory attestation) public view returns(address attestor, address ticketIssuer, address subject, bytes memory ticketId, bytes memory conferenceId, bool attestationValid) //public pure returns(address payable subject, bytes memory ticketId, string memory identifier, address issuer, address attestor)
-    {
+    function _verifyTicketAttestation(bytes memory attestation) internal view returns(address attestor, address ticketIssuer, address subject, bytes memory ticketId, bytes memory conferenceId, bool attestationValid) {
         uint256 decodeIndex = 0;
         uint256 length = 0;
         FullProofOfExponent memory pok;
@@ -136,7 +134,7 @@ contract VerifyAttestation {
         }
     }
 
-    function verifyEqualityProof(bytes memory com1, bytes memory com2, bytes memory proof, bytes memory entropy) public view returns(bool result)
+    function verifyEqualityProof(bytes memory com1, bytes memory com2, bytes memory proof, bytes memory entropy) internal view returns(bool result)
     {
         FullProofOfExponent memory pok;
         bytes memory attestationData;
@@ -157,7 +155,7 @@ contract VerifyAttestation {
     // DER Structure Decoding
     //////////////////////////////////////////////////////////////
 
-    function recoverSignedIdentifierAddress(bytes memory attestation, uint256 hashIndex) public view returns(address signer, address subject, bytes memory commitment1, uint256 resultIndex, bool timeStampValid)
+    function recoverSignedIdentifierAddress(bytes memory attestation, uint256 hashIndex) internal view returns(address signer, address subject, bytes memory commitment1, uint256 resultIndex, bool timeStampValid)
     {
         bytes memory sigData;
 
@@ -213,7 +211,7 @@ contract VerifyAttestation {
         // IdentifierAttestation constructor
     }
 
-    function decodeTimeBlock(bytes memory attestation, uint256 decodeIndex) public view returns (uint256 index, bool valid)
+    function decodeTimeBlock(bytes memory attestation, uint256 decodeIndex) internal view returns (uint256 index, bool valid)
     {
         bytes memory timeBlock;
         uint256 length;
@@ -249,7 +247,7 @@ contract VerifyAttestation {
         resultIndex = decodeIndex + length;
     }
 
-    function recoverTicketSignatureAddress(bytes memory attestation, uint256 hashIndex) public pure returns(address signer, bytes memory ticketId, bytes memory conferenceId, bytes memory commitment2, uint256 resultIndex)
+    function recoverTicketSignatureAddress(bytes memory attestation, uint256 hashIndex) internal pure returns(address signer, bytes memory ticketId, bytes memory conferenceId, bytes memory commitment2, uint256 resultIndex)
     {
         uint256 length;
         uint256 decodeIndex;
@@ -295,7 +293,7 @@ contract VerifyAttestation {
         (startTime, endTime) = getAttestationTimestamp(attestation, decodeIndex + length);
     }
 
-    function getAttestationTimestamp(bytes memory attestation, uint256 decodeIndex) public pure returns(string memory startTime, string memory endTime)
+    function getAttestationTimestamp(bytes memory attestation, uint256 decodeIndex) internal pure returns(string memory startTime, string memory endTime)
     {
         uint256 length = 0;
         bytes memory timeData;
@@ -319,7 +317,7 @@ contract VerifyAttestation {
         endTime = copyStringBlock(timeData);
     }
 
-    function addressFromPublicKey(bytes memory attestation, uint256 decodeIndex) public pure returns(address keyAddress, uint256 resultIndex)
+    function addressFromPublicKey(bytes memory attestation, uint256 decodeIndex) internal pure returns(address keyAddress, uint256 resultIndex)
     {
         uint256 length;
         bytes memory publicKeyBytes;
@@ -335,7 +333,7 @@ contract VerifyAttestation {
     // Cryptography & Ethereum constructs
     //////////////////////////////////////////////////////////////
 
-    function getRiddle(bytes memory com1, bytes memory com2) public view returns(uint256[2] memory riddle)
+    function getRiddle(bytes memory com1, bytes memory com2) internal view returns(uint256[2] memory riddle)
     {
         uint256[2] memory lhs;
         uint256[2] memory rhs;
@@ -361,7 +359,7 @@ contract VerifyAttestation {
      Reference implementation: https://github.com/TokenScript/attestation/blob/main/src/main/java/org/tokenscript/attestation/core/AttestationCrypto.java
     */
 
-    function verifyPOK(bytes memory com1, bytes memory com2, FullProofOfExponent memory pok) private view returns(bool)
+    function verifyPOK(bytes memory com1, bytes memory com2, FullProofOfExponent memory pok) internal view returns(bool)
     {
         // Riddle is H*(r1-r2) with r1, r2 being the secret randomness of com1, respectively com2
         uint256[2] memory riddle = getRiddle(com1, com2);
@@ -424,7 +422,7 @@ contract VerifyAttestation {
         }
     }
 
-    function ecMul(uint256 s, uint256 x, uint256 y) public view
+    function ecMul(uint256 s, uint256 x, uint256 y) internal view
     returns (uint256[2] memory retP)
     {
         bool success;
@@ -455,7 +453,7 @@ contract VerifyAttestation {
         invPoint[1] = uint256(n);
     }
 
-    function ecAdd(uint256[2] memory p1, uint256[2] memory p2) public view
+    function ecAdd(uint256[2] memory p1, uint256[2] memory p2) internal view
     returns (uint256[2] memory retP)
     {
         bool success;
@@ -475,7 +473,7 @@ contract VerifyAttestation {
         }
     }
 
-    function extractXYFromPoint(bytes memory data) public pure returns (uint256 x, uint256 y)
+    function extractXYFromPoint(bytes memory data) internal pure returns (uint256 x, uint256 y)
     {
         assembly
         {
@@ -484,14 +482,14 @@ contract VerifyAttestation {
         }
     }
 
-    function mapTo256BitInteger(bytes memory input) public pure returns(uint256 res)
+    function mapTo256BitInteger(bytes memory input) internal pure returns(uint256 res)
     {
         bytes32 idHash = keccak256(input);
         res = uint256(idHash);
     }
 
     // Note, this will return 0 if the shifted hash > curveOrder, which will cause the equate to fail
-    function mapToCurveMultiplier(bytes memory input) public pure returns(uint256 res)
+    function mapToCurveMultiplier(bytes memory input) internal pure returns(uint256 res)
     {
         bytes memory nextInput = input;
         bytes32 idHash = keccak256(nextInput);
@@ -503,7 +501,7 @@ contract VerifyAttestation {
     }
 
     //Truncates if input is greater than 32 bytes; we only handle 32 byte values.
-    function bytesToUint(bytes memory b) public pure returns (uint256 conv)
+    function bytesToUint(bytes memory b) internal pure returns (uint256 conv)
     {
         if (b.length < 0x20) //if b is less than 32 bytes we need to pad to get correct value
         {

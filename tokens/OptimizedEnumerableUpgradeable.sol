@@ -19,7 +19,7 @@ contract OptimizedEnumerableUpgradeable is IERC721EnumerableUpgradeable, ERC721U
         address ,
         address to,
         uint256 
-    ) internal override {
+    ) internal virtual override {
         if (to == address(0)) {
             _burnt++;
         }

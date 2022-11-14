@@ -10,8 +10,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "@openzeppelin/contracts/utils/Address.sol";
 
-import "hardhat/console.sol";
-import "./DerivedERC2981Royalty.sol";
+import "../royalty/DerivedERC2981Royalty.sol";
 
 contract MintPassOptimized is ERC721, Ownable,  DerivedERC2981Royalty, IERC721Enumerable {
     using SafeMath for uint256;

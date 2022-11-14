@@ -2,38 +2,31 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-
-import "hardhat/console.sol";
-
-contract RoyaltySpliterStatic is Ownable {
-
-    using SafeERC20 for IERC20;
+abstract contract RoyaltySpliterStatic {
    
-    struct receiver {
+    struct Receiver {
         address wallet;
         uint16 revenue;
     }
 
-    receiver[] receivers;
+    Receiver[] private receivers;
     
     event RoyaltyPaid(address receiver, uint256 sum);
-    event RoyaltyPaidERC20(address indexed erc20, address receiver, uint256 sum);
 
     constructor() {
         // validateAndSaveReceivers( initialReceivers );
     }
 
-    function updateRecievers(receiver[] memory newReceivers) external onlyOwner {
+    function getReceivers() internal view returns(Receiver[] memory){
+        return receivers;
+    }
+
+    function updateRecievers(Receiver[] memory newReceivers) external {
+        _authorizeUpdateRecievers(newReceivers);
         validateAndSaveReceivers( newReceivers );
     }
 
-    function validateAndSaveReceivers(receiver[] memory newReceivers) internal {
+    function validateAndSaveReceivers(Receiver[] memory newReceivers) internal {
         uint sum = 0;
         uint i;
 
@@ -56,13 +49,17 @@ contract RoyaltySpliterStatic is Ownable {
     function withdrawETH() external {
         uint balance = address(this).balance;
         require(balance > 0, "Empty balance");
+
+        Receiver[] memory _receivers = getReceivers();
+
+        require(_receivers.length > 0, "No receivers");
         unchecked {
             uint sum;
-            uint len = receivers.length;
+            uint len = _receivers.length;
             for (uint i = 0; i < len; i++){
-                sum = balance * receivers[i].revenue / 10000;
-                emit RoyaltyPaid(receivers[i].wallet, sum);
-                _pay( receivers[i].wallet, sum);
+                sum = balance * _receivers[i].revenue / 10000;
+                emit RoyaltyPaid(_receivers[i].wallet, sum);
+                _pay( _receivers[i].wallet, sum);
             }
 
         }
@@ -73,31 +70,7 @@ contract RoyaltySpliterStatic is Ownable {
         require(sent, "Failed to send Ether");
     }
 
-    function withdraw(address[] calldata contracts) external {
-        for (uint i = 0; i < contracts.length; i++ ){
-            payERC20(contracts[i]);
-        }
-    }
-
-    function payERC20(address erc20) internal {
-        
-        IERC20 erc20c = IERC20(erc20);
-
-        // get this contract balance to withdraw
-        uint balance = erc20c.balanceOf(address(this));
-        // throw error if it requests more that in the contract balance
-        require(balance > 0, "Balance is Empty");
-
-        unchecked {
-            uint sum;
-            uint len = receivers.length;
-            for (uint i = 0; i < len; i++){
-                sum = balance * receivers[i].revenue / 10000;
-                emit RoyaltyPaidERC20( erc20, receivers[i].wallet, sum);
-                erc20c.safeTransfer(receivers[i].wallet, sum);
-            }
-        }
-    }
-
     receive() external payable {}
+
+    function _authorizeUpdateRecievers(Receiver[] memory newReceivers) internal virtual;
 }

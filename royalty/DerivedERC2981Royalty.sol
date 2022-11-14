@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import "../interfaces/_IERC2981.sol";
 
 // Max royalty value is 10000 (100%)
-abstract contract DerivedERC2981Royalty is IERC2981 {
+abstract contract DerivedERC2981Royalty is _IERC2981 {
 
     event RoyaltyUpdated(uint256 value);
 
@@ -24,6 +24,6 @@ abstract contract DerivedERC2981Royalty is IERC2981 {
     /// @dev Support for IERC-2981, royalties
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool)
     {
-        return interfaceId == type(IERC2981).interfaceId;
+        return interfaceId == type(_IERC2981).interfaceId;
     }
 }

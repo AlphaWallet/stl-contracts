@@ -4,8 +4,6 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "./SolRsaVerify.sol";
 
-import "hardhat/console.sol";
-
 library VerifyLinkAttestation {
     using ECDSA for bytes32;
 

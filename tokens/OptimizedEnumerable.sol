@@ -63,7 +63,7 @@ contract OptimizedEnumerable is IERC721Enumerable, ERC721 {
     }
 
     function totalSupply() public view virtual override returns (uint256) {
-        return _tokenIdCounter.current() - _burnt - 1;
+        return _tokenIdCounter.current() - _burnt;
     }
 
     /**

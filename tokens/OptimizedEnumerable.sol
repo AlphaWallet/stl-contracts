@@ -44,7 +44,7 @@ contract OptimizedEnumerable is IERC721Enumerable, ERC721 {
 
         // Counter overflow is impossible as the loop breaks when uint256 i is equal to another uint256 numMintedSoFar.
         unchecked {
-            for (uint256 i = 1; i < numMinted; i++) {
+            for (uint256 i = 0; i < numMinted; i++) {
 
                 if (_exists(i) && (ownerOf(i) == owner) ){
 
@@ -63,7 +63,7 @@ contract OptimizedEnumerable is IERC721Enumerable, ERC721 {
     }
 
     function totalSupply() public view virtual override returns (uint256) {
-        return _tokenIdCounter.current() - _burnt - 1;
+        return _tokenIdCounter.current() - _burnt ;
     }
 
     /**
@@ -78,7 +78,7 @@ contract OptimizedEnumerable is IERC721Enumerable, ERC721 {
 
         // Counter overflow is impossible as the loop breaks when uint256 i is equal to another uint256 numMintedSoFar.
         unchecked {
-            for (uint256 i = 1; i < numMintedSoFar; i++) {
+            for (uint256 i = 0; i < numMintedSoFar; i++) {
                 if (_exists(i)){
                     if (tokenIdsIdx == index) {
                         return i;

@@ -2,6 +2,9 @@
   "name": "stl-contracts",
   "version": "2.1.0",
   "description": "STL contracts",
+  "scripts": {
+    "prettier": "prettier --write **/*.sol"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AlphaWallet/stl-contracts.git"
@@ -12,6 +15,8 @@
     "url": "https://github.com/AlphaWallet/stl-contracts/issues"
   },
   "devDependencies": {
+    "prettier": "^2.4.1",
+    "prettier-plugin-solidity": "^1.1.1",
     "solhint": "^3.3.7"
   }
 }

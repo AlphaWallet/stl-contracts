@@ -24,4 +24,9 @@ jobs:
       - name: solhint
         run: |
           npx -y solhint --init
-          npx -y solhint 'contracts/**/*.sol'
+          npx -y solhint 'access/*.sol'
+          npx -y solhint 'derived/*.sol'
+          npx -y solhint 'ERC/*.sol'
+          npx -y solhint 'interfaces/*.sol'
+          npx -y solhint 'royalty/*.sol'
+          npx -y solhint 'tokens/**/*.sol'

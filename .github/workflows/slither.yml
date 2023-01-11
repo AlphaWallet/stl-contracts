@@ -26,5 +26,25 @@ jobs:
       - name: slither_access
         uses: crytic/slither-action@v0.2.0
         with:
-          target: .
+          target: access
+          node-version: ${{ env.NODE_VER }}
+      - name: slither_derived
+        uses: crytic/slither-action@v0.2.0
+        with:
+          target: derived
+          node-version: ${{ env.NODE_VER }}
+      - name: slither_ERC
+        uses: crytic/slither-action@v0.2.0
+        with:
+          target: ERC
+          node-version: ${{ env.NODE_VER }}
+      - name: slither_royalty
+        uses: crytic/slither-action@v0.2.0
+        with:
+          target: royalty
+          node-version: ${{ env.NODE_VER }}
+      - name: slither_tokens
+        uses: crytic/slither-action@v0.2.0
+        with:
+          target: tokens
           node-version: ${{ env.NODE_VER }}

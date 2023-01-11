@@ -6,7 +6,6 @@ on:
       - node_modules
 
 env:
-  PROJ_PATH: ./
   NODE_VER: 16
 
 jobs:
@@ -27,5 +26,4 @@ jobs:
       - name: slither
         uses: crytic/slither-action@v0.2.0
         with:
-          target: ${{ env.PROJ_PATH }}
           node-version: ${{ env.NODE_VER }}

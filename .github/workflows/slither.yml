@@ -23,12 +23,12 @@ jobs:
           npm -v
           cd "${PROJ_PATH}"
           npm i
-      - name: slither
+      - name: slither_access
         uses: crytic/slither-action@v0.2.0
         with:
           target: access
           node-version: ${{ env.NODE_VER }}
-      - name: slither
+      - name: slither_derived
         uses: crytic/slither-action@v0.2.0
         with:
           target: derived

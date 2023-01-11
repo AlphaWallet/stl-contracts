@@ -10,5 +10,8 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/AlphaWallet/stl-contracts/issues"
+  },
+  "devDependencies": {
+    "solhint": "^3.3.7"
   }
 }

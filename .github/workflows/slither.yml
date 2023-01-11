@@ -26,5 +26,10 @@ jobs:
       - name: slither
         uses: crytic/slither-action@v0.2.0
         with:
-          target: access
+          target: ./
           node-version: ${{ env.NODE_VER }}
+      # - name: slither
+      #   uses: crytic/slither-action@v0.2.0
+      #   with:
+      #     target: derived
+      #     node-version: ${{ env.NODE_VER }}

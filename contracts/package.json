@@ -1,0 +1,14 @@
+{
+  "name": "stl-contracts",
+  "version": "2.1.0",
+  "description": "STL contracts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlphaWallet/stl-contracts.git"
+  },
+  "author": "STL",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlphaWallet/stl-contracts/issues"
+  }
+}

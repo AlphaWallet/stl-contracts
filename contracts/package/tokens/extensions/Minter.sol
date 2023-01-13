@@ -3,7 +3,6 @@
 pragma solidity ^0.8.5;
 
 contract Minter {
-
     mapping(uint => address) private minter;
 
     function _beforeTokenTransfer(
@@ -11,20 +10,18 @@ contract Minter {
         address to,
         uint256 tokenId
     ) internal virtual {
-        if (to == address(0) && from != address(0)){
+        if (to == address(0) && from != address(0)) {
             delete minter[tokenId];
         }
 
-        if ( from == address(0)){
+        if (from == address(0)) {
             minter[tokenId] = to;
         }
-
     }
 
     function getMinter(uint tokenId) public view returns (address) {
         address _minter = minter[tokenId];
-        require (_minter != address(0), "Not minted");
+        require(_minter != address(0), "Not minted");
         return _minter;
     }
-
 }

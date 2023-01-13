@@ -7,9 +7,9 @@ pragma solidity ^0.8.0;
 import "./IERC5169.sol";
 
 abstract contract ERC5169 is IERC5169 {
-
     string[] private _scriptURI;
-    function scriptURI() external view override returns(string[] memory) {
+
+    function scriptURI() external view override returns (string[] memory) {
         return _scriptURI;
     }
 
@@ -21,11 +21,13 @@ abstract contract ERC5169 is IERC5169 {
         emit ScriptUpdate(newScriptURI);
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual returns (bool) {
         return interfaceId == type(IERC5169).interfaceId;
     }
 
-     /**
+    /**
      * @dev Function that should revert when `msg.sender` is not authorized to set script URI. Called by
      * {setScriptURI}.
      *
@@ -35,5 +37,7 @@ abstract contract ERC5169 is IERC5169 {
      * function _authorizeSetScripts(string[] memory) internal override onlyOwner {}
      * ```
      */
-    function _authorizeSetScripts(string[] memory newScriptURI) internal virtual;
+    function _authorizeSetScripts(
+        string[] memory newScriptURI
+    ) internal virtual;
 }

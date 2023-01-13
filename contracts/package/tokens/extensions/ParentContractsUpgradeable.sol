@@ -8,7 +8,6 @@ import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "hardhat/console.sol";
 
 abstract contract ParentContractsUpgradeable {
-
     using AddressUpgradeable for address;
 
     // save as array to be able to foreach parents
@@ -21,32 +20,38 @@ abstract contract ParentContractsUpgradeable {
 
     function _authorizeAddParent(address newContract) internal virtual;
 
-    // array of ERC721 contracts to be parents to mint derived NFT 
-    function getParents() public view virtual returns(address[] memory) {
+    // array of ERC721 contracts to be parents to mint derived NFT
+    function getParents() public view virtual returns (address[] memory) {
         return allowedParentsArray;
     }
 
-    function addParentAndBeneficiary(address newContract, address royaltyBeneficiary) public {
+    function addParentAndBeneficiary(
+        address newContract,
+        address royaltyBeneficiary
+    ) public {
         addParent(newContract);
         parentContractBeneficiaries[newContract] = royaltyBeneficiary;
     }
 
-    function getRoyaltyBeneficiary(address _parentContract) internal view returns (address beneficiary) {
+    function getRoyaltyBeneficiary(
+        address _parentContract
+    ) internal view returns (address beneficiary) {
         beneficiary = parentContractBeneficiaries[_parentContract];
 
-        require (beneficiary != address(0), "Beneficiary undefined");
+        require(beneficiary != address(0), "Beneficiary undefined");
     }
 
     function addParent(address newContract) public {
-
-        _authorizeAddParent( newContract);
+        _authorizeAddParent(newContract);
 
         require(newContract.isContract(), "Must be contract");
 
         IERC721 c = IERC721(newContract);
 
-        try c.supportsInterface(type(IERC721).interfaceId) returns (bool result) {
-            if (!result){
+        try c.supportsInterface(type(IERC721).interfaceId) returns (
+            bool result
+        ) {
+            if (!result) {
                 revert("Must be ERC721 contract");
             }
         } catch {
@@ -60,11 +65,9 @@ abstract contract ParentContractsUpgradeable {
         allowedParentsArray.push(newContract);
         allowedParents[newContract] = allowedParentsArray.length;
         emit ParentAdded(newContract);
-
     }
 
-    function isAllowedParent(address _contract) internal view returns (bool){
+    function isAllowedParent(address _contract) internal view returns (bool) {
         return allowedParents[_contract] > 0;
     }
-
 }

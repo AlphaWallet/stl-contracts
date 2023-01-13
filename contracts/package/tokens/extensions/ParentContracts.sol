@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
 abstract contract ParentContracts {
-
     using Address for address;
 
     // save as array to be able to foreach parents
@@ -18,21 +17,22 @@ abstract contract ParentContracts {
 
     function _authorizeAddParent(address newContract) internal virtual;
 
-    // array of ERC721 contracts to be parents to mint derived NFT 
-    function getParents() public view virtual returns(address[] memory) {
+    // array of ERC721 contracts to be parents to mint derived NFT
+    function getParents() public view virtual returns (address[] memory) {
         return allowedParentsArray;
     }
 
     function addParent(address newContract) public {
-
-        _authorizeAddParent( newContract);
+        _authorizeAddParent(newContract);
 
         require(newContract.isContract(), "Must be contract");
 
         IERC721 c = IERC721(newContract);
 
-        try c.supportsInterface(type(IERC721).interfaceId) returns (bool result) {
-            if (!result){
+        try c.supportsInterface(type(IERC721).interfaceId) returns (
+            bool result
+        ) {
+            if (!result) {
                 revert("Must be ERC721 contract");
             }
         } catch {
@@ -46,11 +46,9 @@ abstract contract ParentContracts {
         allowedParentsArray.push(newContract);
         allowedParents[newContract] = allowedParentsArray.length;
         emit ParentAdded(newContract);
-
     }
 
-    function isAllowedParent(address _contract) internal view returns (bool){
+    function isAllowedParent(address _contract) internal view returns (bool) {
         return allowedParents[_contract] > 0;
     }
-
 }

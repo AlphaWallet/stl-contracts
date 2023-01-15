@@ -1,9 +1,6 @@
 name: "Slither CI"
 
-on:
-  pull_request:
-    paths-ignore:
-      - node_modules
+on: [push, pull_request]
 
 env:
   NODE_VER: 16
@@ -15,36 +12,31 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: ${{ env.NODE_VER }}
       - run: |
           echo -n "Node version: "
           node -v
           echo -n "Npm version: "
           npm -v
-          cd "${PROJ_PATH}"
           npm i
-      - name: slither_access
-        uses: crytic/slither-action@v0.2.0
+      - name: slither
+        id: slither
+        run: |
+          pip3 install slither-analyzer solc-select
+          SOLCVER="$(solc-select install | tail -1)"
+          solc-select install "$SOLCVER"
+          solc-select use "$SOLCVER"
+          slither --sarif results.sarif \
+            --filter-paths "node_modules" \
+            --checklist \
+            --markdown-root "https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/" \
+            '**/*.sol' > slither_report.md
+      - name: Post SARIF findings in the pull request
+        uses: thollander/actions-comment-pull-request@v2
+        if: github.event_name == 'pull_request' && (success() || failure())
         with:
-          target: access
-          node-version: ${{ env.NODE_VER }}
-      - name: slither_derived
-        uses: crytic/slither-action@v0.2.0
+          filePath: "slither_report.md"
+      - uses: Ayrx/sarif_to_github_annotations@v0.2.2
+        if: success() || failure()
         with:
-          target: derived
-          node-version: ${{ env.NODE_VER }}
-      - name: slither_ERC
-        uses: crytic/slither-action@v0.2.0
-        with:
-          target: ERC
-          node-version: ${{ env.NODE_VER }}
-      - name: slither_royalty
-        uses: crytic/slither-action@v0.2.0
-        with:
-          target: royalty
-          node-version: ${{ env.NODE_VER }}
-      - name: slither_tokens
-        uses: crytic/slither-action@v0.2.0
-        with:
-          target: tokens
-          node-version: ${{ env.NODE_VER }}
+          sarif_file: results.sarif

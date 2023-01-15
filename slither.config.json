@@ -1,7 +1,0 @@
-{
-  "buidler_cache_directory": "build/cache",
-  "hardhat_artifacts_directory": "build/artifacts",
-  "exclude_low": true,
-  "exclude_medium": true,
-  "detectors_to_exclude": "reentrancy-events, solc-version, naming-convention, dead-code, unimplemented-functions"
-}

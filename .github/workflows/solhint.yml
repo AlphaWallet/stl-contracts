@@ -1,9 +1,6 @@
 name: "Solhint CI"
 
-on:
-  pull_request:
-    paths-ignore:
-      - node_modules
+on: [push, pull_request]
 
 env:
   NODE_VER: 16
@@ -22,11 +19,18 @@ jobs:
           npm -v
           npm i
       - name: solhint
+        id: solhint
         run: |
+          set -o pipefail
+          set +e
           npx -y solhint --init
-          npx -y solhint 'access/*.sol'
-          npx -y solhint 'derived/*.sol'
-          npx -y solhint 'ERC/*.sol'
-          npx -y solhint 'interfaces/*.sol'
-          npx -y solhint 'royalty/*.sol'
-          npx -y solhint 'tokens/**/*.sol'
+          echo -e 'solhint result for ${{ github.sha }}:\n```' > solhint.md
+          npx -y solhint --ignore-path 'node_modules' '**/*.sol' | tee -a solhint.md
+          exit_code=$?
+          echo '```' >> solhint.md
+          exit ${exit_code}
+      - name: Comment PR for solhint
+        uses: thollander/actions-comment-pull-request@v2
+        if: github.event_name == 'pull_request' && (success() || failure())
+        with:
+          filePath: "solhint.md"

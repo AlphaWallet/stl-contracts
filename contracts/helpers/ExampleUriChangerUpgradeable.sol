@@ -6,11 +6,7 @@ import "../package/access/UriChangerUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract ExampleUriChangerUpgradeable is
-    OwnableUpgradeable,
-    UriChangerUpgradeable,
-    UUPSUpgradeable
-{
+contract ExampleUriChangerUpgradeable is OwnableUpgradeable, UriChangerUpgradeable, UUPSUpgradeable {
     uint public val;
 
     /**
@@ -25,13 +21,9 @@ contract ExampleUriChangerUpgradeable is
 
     function _uriChangerOnlyInitializing() internal override onlyInitializing {}
 
-    function _authorizeUpdateUriChanger(
-        address newAddress
-    ) internal override onlyOwner {}
+    function _authorizeUpdateUriChanger(address newAddress) internal override onlyOwner {}
 
-    function _authorizeUpgrade(
-        address newImplementation
-    ) internal override onlyOwner {}
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     function setValue(uint _val) public onlyUriChanger {
         val = _val;

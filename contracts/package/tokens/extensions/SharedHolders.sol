@@ -10,9 +10,7 @@ abstract contract SharedHolders {
 
     event SharedTokenHoldersUpdated(address[] newAddresses);
 
-    function _authorizeSetSharedHolder(
-        address[] calldata newAddresses
-    ) internal virtual;
+    function _authorizeSetSharedHolder(address[] calldata newAddresses) internal virtual;
 
     // SharedTokenHolder - some STL address, which holds popular NFTs,
     // contract allowed to mint derived NFTs for NFTs, owned by this token
@@ -23,10 +21,7 @@ abstract contract SharedHolders {
         _sharedTokenHolders = newAddresses;
     }
 
-    function _isSharedHolderTokenOwner(
-        address _contract,
-        uint256 tokenId
-    ) internal view returns (bool) {
+    function _isSharedHolderTokenOwner(address _contract, uint256 tokenId) internal view returns (bool) {
         ERC721 t = ERC721(_contract);
         address nftOwner = t.ownerOf(tokenId);
         uint length = _sharedTokenHolders.length;

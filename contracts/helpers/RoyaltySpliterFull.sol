@@ -6,7 +6,5 @@ import "../package/royalty/RoyaltySpliterERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract RoyaltySpliterFull is Ownable, RoyaltySpliterERC20 {
-    function _authorizeUpdateRecievers(
-        Receiver[] memory newReceivers
-    ) internal override onlyOwner {}
+    function _authorizeUpdateRecievers(Receiver[] memory newReceivers) internal override onlyOwner {}
 }

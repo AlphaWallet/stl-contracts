@@ -5,12 +5,7 @@ pragma solidity ^0.8.16;
 contract Minter {
     mapping(uint => address) private _minter;
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256
-    ) internal virtual {
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256) internal virtual {
         if (to == address(0) && from != address(0)) {
             delete _minter[tokenId];
         }

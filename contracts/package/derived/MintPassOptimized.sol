@@ -12,12 +12,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 
 import "../royalty/DerivedERC2981Royalty.sol";
 
-contract MintPassOptimized is
-    ERC721,
-    Ownable,
-    DerivedERC2981Royalty,
-    IERC721Enumerable
-{
+contract MintPassOptimized is ERC721, Ownable, DerivedERC2981Royalty, IERC721Enumerable {
     using SafeMath for uint256;
     using Address for address;
 
@@ -31,8 +26,7 @@ contract MintPassOptimized is
     address _royaltyReceiver;
     // slither-disable-end naming-convention
 
-    string constant _CONTRACT_URI =
-        "https://niftytailor.com/contracts/mintpass.json";
+    string constant _CONTRACT_URI = "https://niftytailor.com/contracts/mintpass.json";
     string constant _TOKEN_URI = "https://niftytailor.com/token/mintpass.json";
 
     uint256 constant _ALLOWED_NUMBER_OF_MINTPASSES = 10;
@@ -80,28 +74,14 @@ contract MintPassOptimized is
     // required to solve inheritance
     function supportsInterface(
         bytes4 interfaceId
-    )
-        public
-        view
-        virtual
-        override(IERC165, ERC721, DerivedERC2981Royalty)
-        returns (bool)
-    {
-        return
-            ERC721.supportsInterface(interfaceId) ||
-            DerivedERC2981Royalty.supportsInterface(interfaceId);
+    ) public view virtual override(IERC165, ERC721, DerivedERC2981Royalty) returns (bool) {
+        return ERC721.supportsInterface(interfaceId) || DerivedERC2981Royalty.supportsInterface(interfaceId);
     }
 
     function royaltyInfo(
         uint256 tokenId,
         uint256 salePrice
-    )
-        external
-        view
-        virtual
-        override
-        returns (address receiver, uint256 royaltyAmount)
-    {
+    ) external view virtual override returns (address receiver, uint256 royaltyAmount) {
         require(_exists(tokenId), "Token doesnt exist.");
         // receiver = _getTokenOwner(tokenId);
         receiver = _royaltyReceiver;
@@ -157,33 +137,16 @@ contract MintPassOptimized is
         // uint256 currentBalance = ERC721Upgradeable.balanceOf(_msgSender());
         uint256 minted = _mintedPerAddress[_msgSender()];
 
-        require(
-            _getMintPrice().mul(mintpassNumber) == msg.value,
-            "Ether value sent is not correct"
-        );
+        require(_getMintPrice().mul(mintpassNumber) == msg.value, "Ether value sent is not correct");
 
-        require(
-            _MAX_PER_ADDRESS >= (minted + mintpassNumber),
-            "Too much MintPasses requested"
-        );
-        require(
-            _getMaxAllowed() >=
-                (_tokenIdCounter.current() - 1 + mintpassNumber),
-            "Limit reached"
-        );
+        require(_MAX_PER_ADDRESS >= (minted + mintpassNumber), "Too much MintPasses requested");
+        require(_getMaxAllowed() >= (_tokenIdCounter.current() - 1 + mintpassNumber), "Limit reached");
         // require( _isTokenOwner(erc721, tokenId), "Sender not an owner");
 
         uint256 originsNumber = _getBalance(_BAYC) + _getBalance(_MAYC);
 
-        require(
-            originsNumber * _ALLOWED_NUMBER_OF_MINTPASSES > minted,
-            "Not enough origins."
-        );
-        require(
-            originsNumber * _ALLOWED_NUMBER_OF_MINTPASSES - minted >=
-                mintpassNumber,
-            "Not enough origins"
-        );
+        require(originsNumber * _ALLOWED_NUMBER_OF_MINTPASSES > minted, "Not enough origins.");
+        require(originsNumber * _ALLOWED_NUMBER_OF_MINTPASSES - minted >= mintpassNumber, "Not enough origins");
 
         _mintedPerAddress[_msgSender()] = minted + mintpassNumber;
 
@@ -212,13 +175,8 @@ contract MintPassOptimized is
         return _CONTRACT_URI;
     }
 
-    function tokenURI(
-        uint256 tokenId
-    ) public view virtual override returns (string memory) {
-        require(
-            _exists(tokenId),
-            "ERC721Metadata: URI query for nonexistent token"
-        );
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
         return _TOKEN_URI;
     }
@@ -232,10 +190,7 @@ contract MintPassOptimized is
     /**
      * Foreach all minted tokens until reached appropriate index
      */
-    function tokenOfOwnerByIndex(
-        address owner,
-        uint256 index
-    ) public view virtual override returns (uint256) {
+    function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
         require(index < balanceOf(owner), "MP: owner index out of bounds");
 
         uint256 numMintedSoFar = _tokenIdCounter.current();
@@ -266,9 +221,7 @@ contract MintPassOptimized is
     /**
      * @dev See {IERC721Enumerable-tokenByIndex}.
      */
-    function tokenByIndex(
-        uint256 index
-    ) public view virtual override returns (uint256) {
+    function tokenByIndex(uint256 index) public view virtual override returns (uint256) {
         uint256 numMintedSoFar = _tokenIdCounter.current();
 
         require(index < totalSupply(), "MP: index out of bounds");

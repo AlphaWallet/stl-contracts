@@ -21,9 +21,7 @@ abstract contract ERC5169 is IERC5169 {
         emit ScriptUpdate(newScriptURI);
     }
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
         return interfaceId == type(IERC5169).interfaceId;
     }
 
@@ -37,7 +35,5 @@ abstract contract ERC5169 is IERC5169 {
      * function _authorizeSetScripts(string[] memory) internal override onlyOwner {}
      * ```
      */
-    function _authorizeSetScripts(
-        string[] memory newScriptURI
-    ) internal virtual;
+    function _authorizeSetScripts(string[] memory newScriptURI) internal virtual;
 }

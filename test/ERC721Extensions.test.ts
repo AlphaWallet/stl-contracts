@@ -22,10 +22,7 @@ describe("ERC20 extensions", function () {
       value: ethers.utils.parseEther("3.0"),
     });
 
-    await expect(contract.connect(owner).mint(user2.address)).to.emit(
-      contract,
-      "Transfer"
-    );
+    await expect(contract.connect(owner).mint(user2.address)).to.emit(contract, "Transfer");
     expect(await contract.ownerOf(0)).to.eq(user2.address);
     expect(await contract.getMinter(0)).to.eq(user2.address);
 
@@ -36,23 +33,13 @@ describe("ERC20 extensions", function () {
   it("ParentContracts", async function () {
     const { contract, user, user2, user3, owner } = await setup();
 
-    const mockERC721 = await waffle.deployMockContract(
-      owner,
-      SampleERC721Json.abi
-    );
+    const mockERC721 = await waffle.deployMockContract(owner, SampleERC721Json.abi);
     await mockERC721.mock.supportsInterface.returns(false);
-    await expect(
-      contract.connect(owner).addParent(mockERC721.address)
-    ).to.revertedWith("Must be ERC721 contract");
-    await expect(
-      contract.connect(user2).addParent(mockERC721.address)
-    ).to.revertedWith("Ownable: caller is not the owner");
+    await expect(contract.connect(owner).addParent(mockERC721.address)).to.revertedWith("Must be ERC721 contract");
+    await expect(contract.connect(user2).addParent(mockERC721.address)).to.revertedWith("Ownable: caller is not the owner");
 
     await mockERC721.mock.supportsInterface.returns(true);
-    await expect(contract.connect(owner).addParent(mockERC721.address)).to.emit(
-      contract,
-      "ParentAdded"
-    );
+    await expect(contract.connect(owner).addParent(mockERC721.address)).to.emit(contract, "ParentAdded");
 
     expect(await contract.getParents()).to.eql([mockERC721.address]);
   });
@@ -60,10 +47,7 @@ describe("ERC20 extensions", function () {
   it("Enumerable", async function () {
     const { contract, user, user2, user3, owner } = await setup();
 
-    await expect(contract.connect(owner).mint(user2.address)).to.emit(
-      contract,
-      "Transfer"
-    );
+    await expect(contract.connect(owner).mint(user2.address)).to.emit(contract, "Transfer");
 
     expect(await contract.balanceOf(user2.address)).to.eq(1);
     expect(await contract.totalSupply()).to.eq(1);
@@ -74,22 +58,10 @@ describe("ERC20 extensions", function () {
   it("Enumerable + Burn", async function () {
     const { contract, user, user2, user3, owner } = await setup();
 
-    await expect(contract.connect(owner).mint(user2.address)).to.emit(
-      contract,
-      "Transfer"
-    );
-    await expect(contract.connect(owner).mint(user2.address)).to.emit(
-      contract,
-      "Transfer"
-    );
-    await expect(contract.connect(owner).mint(user3.address)).to.emit(
-      contract,
-      "Transfer"
-    );
-    await expect(contract.connect(owner).mint(user2.address)).to.emit(
-      contract,
-      "Transfer"
-    );
+    await expect(contract.connect(owner).mint(user2.address)).to.emit(contract, "Transfer");
+    await expect(contract.connect(owner).mint(user2.address)).to.emit(contract, "Transfer");
+    await expect(contract.connect(owner).mint(user3.address)).to.emit(contract, "Transfer");
+    await expect(contract.connect(owner).mint(user2.address)).to.emit(contract, "Transfer");
     await expect(contract.connect(user2).burn(1)).to.emit(contract, "Transfer");
 
     expect(await contract.balanceOf(user2.address)).to.eq(2);
@@ -108,31 +80,16 @@ describe("ERC20 extensions", function () {
   it("SharedHolders", async function () {
     const { contract, user, user2, user3, owner } = await setup();
 
-    await expect(contract.connect(owner).mint(user3.address)).to.emit(
-      contract,
-      "Transfer"
-    );
+    await expect(contract.connect(owner).mint(user3.address)).to.emit(contract, "Transfer");
 
-    expect(await contract.isSharedHolderTokenOwner(contract.address, 0)).to.eq(
-      false
-    );
+    expect(await contract.isSharedHolderTokenOwner(contract.address, 0)).to.eq(false);
 
-    await expect(
-      contract.connect(owner).setSharedTokenHolders([user2.address])
-    ).to.emit(contract, "SharedTokenHoldersUpdated");
+    await expect(contract.connect(owner).setSharedTokenHolders([user2.address])).to.emit(contract, "SharedTokenHoldersUpdated");
 
-    expect(await contract.isSharedHolderTokenOwner(contract.address, 0)).to.eq(
-      false
-    );
+    expect(await contract.isSharedHolderTokenOwner(contract.address, 0)).to.eq(false);
 
-    await expect(
-      contract
-        .connect(owner)
-        .setSharedTokenHolders([user2.address, user3.address])
-    ).to.emit(contract, "SharedTokenHoldersUpdated");
+    await expect(contract.connect(owner).setSharedTokenHolders([user2.address, user3.address])).to.emit(contract, "SharedTokenHoldersUpdated");
 
-    expect(await contract.isSharedHolderTokenOwner(contract.address, 0)).to.eq(
-      true
-    );
+    expect(await contract.isSharedHolderTokenOwner(contract.address, 0)).to.eq(true);
   });
 });

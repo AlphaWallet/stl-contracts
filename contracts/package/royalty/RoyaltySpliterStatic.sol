@@ -25,9 +25,7 @@ abstract contract RoyaltySpliterStatic {
         _validateAndSaveReceivers(newReceivers);
     }
 
-    function _validateAndSaveReceivers(
-        Receiver[] memory newReceivers
-    ) internal {
+    function _validateAndSaveReceivers(Receiver[] memory newReceivers) internal {
         uint sum = 0;
         uint i;
 
@@ -79,7 +77,5 @@ abstract contract RoyaltySpliterStatic {
 
     receive() external payable {}
 
-    function _authorizeUpdateRecievers(
-        Receiver[] memory newReceivers
-    ) internal virtual;
+    function _authorizeUpdateRecievers(Receiver[] memory newReceivers) internal virtual;
 }

@@ -10,11 +10,7 @@ import "./RoyaltySpliterStatic.sol";
 abstract contract RoyaltySpliterERC20 is RoyaltySpliterStatic {
     using SafeERC20 for IERC20;
 
-    event RoyaltyPaidERC20(
-        address indexed erc20,
-        address receiver,
-        uint256 sum
-    );
+    event RoyaltyPaidERC20(address indexed erc20, address receiver, uint256 sum);
 
     function withdrawERC20(address[] calldata contracts) external {
         Receiver[] memory receivers = _getReceivers();

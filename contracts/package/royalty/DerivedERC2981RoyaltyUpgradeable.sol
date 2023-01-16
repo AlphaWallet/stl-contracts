@@ -23,9 +23,7 @@ abstract contract DerivedERC2981RoyaltyUpgradeable is IERC2981Upgradeable {
     }
 
     /// @dev Support for IERC-2981, royalties
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IERC2981Upgradeable).interfaceId;
     }
 }

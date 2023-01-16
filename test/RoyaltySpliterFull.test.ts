@@ -6,9 +6,7 @@ describe("Derived Contracts Test", function () {
   async function setup() {
     const [owner, user, user2, user3, user4] = await ethers.getSigners();
 
-    const RoyaltySpliterFull = (
-      await ethers.getContractFactory("RoyaltySpliterFull")
-    ).connect(owner);
+    const RoyaltySpliterFull = (await ethers.getContractFactory("RoyaltySpliterFull")).connect(owner);
     let contract = await RoyaltySpliterFull.connect(owner).deploy();
     await contract.deployed();
 
@@ -29,9 +27,7 @@ describe("Derived Contracts Test", function () {
       value: ethers.utils.parseEther("3.0"),
     });
 
-    let initContractBalance = await ethers.provider.getBalance(
-      contract.address
-    );
+    let initContractBalance = await ethers.provider.getBalance(contract.address);
 
     await expect(contract.withdrawETH()).to.revertedWith("No receivers");
 
@@ -51,16 +47,10 @@ describe("Derived Contracts Test", function () {
 
     let resultUserBalance2 = await ethers.provider.getBalance(user2.address);
     let resultUserBalance3 = await ethers.provider.getBalance(user3.address);
-    let resultContractBalance = await ethers.provider.getBalance(
-      contract.address
-    );
+    let resultContractBalance = await ethers.provider.getBalance(contract.address);
 
-    expect(resultUserBalance2.sub(initUserBalance2)).to.eq(
-      initContractBalance.mul(user2Rate).div(100)
-    );
-    expect(resultUserBalance3.sub(initUserBalance3)).to.eq(
-      initContractBalance.mul(user3Rate).div(100)
-    );
+    expect(resultUserBalance2.sub(initUserBalance2)).to.eq(initContractBalance.mul(user2Rate).div(100));
+    expect(resultUserBalance3.sub(initUserBalance3)).to.eq(initContractBalance.mul(user3Rate).div(100));
 
     expect(resultContractBalance).to.eq(0);
   });
@@ -68,9 +58,7 @@ describe("Derived Contracts Test", function () {
   it("split mint ERC20", async function () {
     const { contract, user, user2, user3, owner } = await setup();
 
-    const ExampleERC20 = (
-      await ethers.getContractFactory("ExampleERC20")
-    ).connect(owner);
+    const ExampleERC20 = (await ethers.getContractFactory("ExampleERC20")).connect(owner);
 
     let erc20_1 = await ExampleERC20.connect(owner).deploy("N", "S");
     await erc20_1.deployed();
@@ -92,22 +80,12 @@ describe("Derived Contracts Test", function () {
       ])
     ).to.not.reverted;
 
-    await expect(
-      contract.withdrawERC20([erc20_1.address, erc20_2.address])
-    ).to.emit(contract, "RoyaltyPaidERC20");
+    await expect(contract.withdrawERC20([erc20_1.address, erc20_2.address])).to.emit(contract, "RoyaltyPaidERC20");
 
-    expect(await erc20_1.balanceOf(user2.address)).to.eq(
-      (erc20_1_amount / 100) * user1Rate
-    );
-    expect(await erc20_1.balanceOf(user3.address)).to.eq(
-      (erc20_1_amount / 100) * user2Rate
-    );
+    expect(await erc20_1.balanceOf(user2.address)).to.eq((erc20_1_amount / 100) * user1Rate);
+    expect(await erc20_1.balanceOf(user3.address)).to.eq((erc20_1_amount / 100) * user2Rate);
 
-    expect(await erc20_2.balanceOf(user2.address)).to.eq(
-      (erc20_2_amount / 100) * user1Rate
-    );
-    expect(await erc20_2.balanceOf(user3.address)).to.eq(
-      (erc20_2_amount / 100) * user2Rate
-    );
+    expect(await erc20_2.balanceOf(user2.address)).to.eq((erc20_2_amount / 100) * user1Rate);
+    expect(await erc20_2.balanceOf(user3.address)).to.eq((erc20_2_amount / 100) * user2Rate);
   });
 });

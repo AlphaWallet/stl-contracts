@@ -1,13 +1,5 @@
 const { waffle, ethers } = require("hardhat");
-const {
-  provider,
-  deployContract,
-  solidity,
-  link,
-  deployMockContract,
-  createFixtureLoader,
-  loadFixture,
-} = waffle;
+const { provider, deployContract, solidity, link, deployMockContract, createFixtureLoader, loadFixture } = waffle;
 
 const { expect } = require("chai");
 
@@ -25,15 +17,11 @@ describe("ERC5169", () => {
 
     expect(await contract.scriptURI()).to.eql([]);
 
-    await expect(contract.connect(user).setScriptURI([])).to.revertedWith(
-      "Ownable: caller is not the owner"
-    );
+    await expect(contract.connect(user).setScriptURI([])).to.revertedWith("Ownable: caller is not the owner");
 
     const scriptURI = ["uri1", "uri2", "uri3"];
 
-    await expect(contract.connect(owner).setScriptURI(scriptURI))
-      .to.emit(contract, "ScriptUpdate")
-      .withArgs(scriptURI);
+    await expect(contract.connect(owner).setScriptURI(scriptURI)).to.emit(contract, "ScriptUpdate").withArgs(scriptURI);
 
     expect(await contract.scriptURI()).to.eql(scriptURI);
   });

@@ -5,10 +5,7 @@ pragma solidity ^0.8.16;
 abstract contract UriChangerBase {
     address private _uriChanger;
 
-    event UriChangerUpdated(
-        address indexed previousAddress,
-        address indexed newAddress
-    );
+    event UriChangerUpdated(address indexed previousAddress, address indexed newAddress);
 
     /**
      * @dev Returns the address of the current owner.
@@ -21,10 +18,7 @@ abstract contract UriChangerBase {
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyUriChanger() {
-        require(
-            _getUriChanger() == msg.sender,
-            "UriChanger: caller is not allowed"
-        );
+        require(_getUriChanger() == msg.sender, "UriChanger: caller is not allowed");
         _;
     }
 

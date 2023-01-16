@@ -13,9 +13,7 @@ contract ExampleUriChanger is Ownable, UriChanger {
      */
     constructor() UriChanger(msg.sender) {}
 
-    function _authorizeUpdateUriChanger(
-        address newAddress
-    ) internal override onlyOwner {}
+    function _authorizeUpdateUriChanger(address newAddress) internal override onlyOwner {}
 
     function setValue(uint _val) public onlyUriChanger {
         val = _val;

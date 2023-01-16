@@ -57,20 +57,24 @@ abstract contract RoyaltySpliterStatic {
         unchecked {
             uint sum;
             uint len = receivers_.length;
+            // slither-disable-start reentrancy-events
             for (uint i = 0; i < len; i++) {
                 sum = (balance * receivers_[i].revenue) / 10000;
                 emit RoyaltyPaid(receivers_[i].wallet, sum);
                 _pay(receivers_[i].wallet, sum);
             }
+            // slither-disable-end reentrancy-events
         }
     }
 
     /* solhint-disable func-param-name-mixedcase */
     /* solhint-disable var-name-mixedcase */
     function _pay(address ETHreceiver, uint256 amount) internal {
-        //slither-disable-next-line low-level-calls
+        // slither-disable-start low-level-calls
+        // slither-disable-next-line calls-loop, unused-state
         (bool sent, ) = ETHreceiver.call{value: amount}("");
         require(sent, "Failed to send Ether");
+        // slither-disable-end low-level-calls
     }
 
     receive() external payable {}

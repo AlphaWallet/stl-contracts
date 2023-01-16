@@ -139,6 +139,7 @@ contract MintPassOptimized is
     }
 
     // we can use it in derived contract
+    //slither-disable-next-line dead-code
     function _setMintedForAddress(address addr, uint value) internal {
         _mintedPerAddress[addr] = value;
     }
@@ -238,7 +239,7 @@ contract MintPassOptimized is
         require(index < balanceOf(owner), "MP: owner index out of bounds");
 
         uint256 numMintedSoFar = _tokenIdCounter.current();
-        uint256 tokenIdsIdx;
+        uint256 tokenIdsIdx = 0;
 
         // Counter overflow is impossible as the loop breaks when uint256 i is equal to another uint256 numMintedSoFar.
         unchecked {
@@ -271,7 +272,7 @@ contract MintPassOptimized is
         uint256 numMintedSoFar = _tokenIdCounter.current();
 
         require(index < totalSupply(), "MP: index out of bounds");
-        uint256 tokenIdsIdx;
+        uint256 tokenIdsIdx = 0;
 
         // Counter overflow is impossible as the loop breaks when uint256 i is equal to another uint256 numMintedSoFar.
         unchecked {

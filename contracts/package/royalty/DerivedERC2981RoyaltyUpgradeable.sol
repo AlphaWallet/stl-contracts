@@ -10,12 +10,14 @@ abstract contract DerivedERC2981RoyaltyUpgradeable is IERC2981Upgradeable {
 
     uint256 private _royalty;
 
+    //slither-disable-next-line dead-code
     function _setRoyalty(uint256 value) internal {
         require(value <= 10000, "Royalty more that 100%");
         emit RoyaltyUpdated(value);
         _royalty = value;
     }
 
+    //slither-disable-next-line dead-code
     function _getRoyalty() internal view returns (uint256) {
         return _royalty;
     }

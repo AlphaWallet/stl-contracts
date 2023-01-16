@@ -38,6 +38,7 @@ abstract contract SharedHolders {
         return false;
     }
 
+    //slither-disable-next-line dead-code
     function _hasSharedTokenHolders() internal view returns (bool) {
         return _sharedTokenHolders.length > 0;
     }

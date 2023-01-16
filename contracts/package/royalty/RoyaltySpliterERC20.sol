@@ -21,10 +21,12 @@ abstract contract RoyaltySpliterERC20 is RoyaltySpliterStatic {
 
         require(receivers.length > 0, "No receivers");
         for (uint i = 0; i < contracts.length; i++) {
+            //slither-disable-next-line calls-inside-a-loop
             _payERC20(contracts[i], receivers);
         }
     }
 
+    //slither-disable-next-line calls-loop
     function _payERC20(address erc20, Receiver[] memory receivers) internal {
         IERC20 erc20c = IERC20(erc20);
 
@@ -36,11 +38,13 @@ abstract contract RoyaltySpliterERC20 is RoyaltySpliterStatic {
         unchecked {
             uint sum;
             uint len = receivers.length;
+            // slither-disable-start reentrancy-events
             for (uint i = 0; i < len; i++) {
                 sum = (balance * receivers[i].revenue) / 10000;
                 emit RoyaltyPaidERC20(erc20, receivers[i].wallet, sum);
                 erc20c.safeTransfer(receivers[i].wallet, sum);
             }
+            // slither-disable-end reentrancy-events
         }
     }
 }

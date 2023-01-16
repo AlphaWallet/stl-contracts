@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 abstract contract SharedHolders {
+    //slither-disable-next-line naming-convention
     address[] _sharedTokenHolders;
 
     event SharedTokenHoldersUpdated(address[] newAddresses);

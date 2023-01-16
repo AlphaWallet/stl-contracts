@@ -14,7 +14,7 @@
     "clean": "hardhat clean && rimraf build contracts/build",
     "test": "hardhat test",
     "gas-report": "env ENABLE_GAS_REPORT=true npm run test",
-    "slither": "npm run clean && slither . --detect reentrancy-eth,reentrancy-no-eth,reentrancy-unlimited-gas"
+    "slither": "npm run clean && slither ."
   },
   "repository": {
     "type": "git",

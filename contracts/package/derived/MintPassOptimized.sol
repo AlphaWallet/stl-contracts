@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
@@ -24,10 +24,12 @@ contract MintPassOptimized is
     using Counters for Counters.Counter;
 
     /* solhint-disable var-name-mixedcase */
+    // slither-disable-start naming-convention
     address immutable _BAYC;
     address immutable _MAYC;
     address immutable _DAPE;
     address _royaltyReceiver;
+    // slither-disable-end naming-convention
 
     string constant _CONTRACT_URI =
         "https://niftytailor.com/contracts/mintpass.json";
@@ -40,6 +42,7 @@ contract MintPassOptimized is
 
     Counters.Counter private _tokenIdCounter;
     /* solhint-disable var-name-mixedcase */
+    //slither-disable-next-line naming-convention
     uint256 immutable _MINT_START_TIME;
 
     // count burnt token number to calc totalSupply()
@@ -48,6 +51,7 @@ contract MintPassOptimized is
     event MintpassesMinted(address indexed requestor, uint indexed number);
     event RoyaltyContractUpdate(address indexed newAddress);
 
+    //slither-disable-next-line naming-convention
     mapping(address => uint256) internal _mintedPerAddress;
 
     constructor(
@@ -59,6 +63,7 @@ contract MintPassOptimized is
         address rr_,
         uint256 mintStartTime_
     ) ERC721(name_, symbol_) Ownable() {
+        require(bayc_ != address(0) && mayc_ != address(0) && dape_ != address(0), "Contract required");
         _BAYC = bayc_;
         _MAYC = mayc_;
         _DAPE = dape_;
@@ -115,6 +120,7 @@ contract MintPassOptimized is
 
     function withdraw() public onlyOwner {
         uint balance = address(this).balance;
+        //slither-disable-next-line low-level-calls
         (bool sent, ) = _msgSender().call{value: balance}("");
         require(sent, "Failed to send Ether");
     }
@@ -181,7 +187,7 @@ contract MintPassOptimized is
         _mintedPerAddress[_msgSender()] = minted + mintpassNumber;
 
         for (uint i = 0; i < mintpassNumber; i++) {
-            __mint(_msgSender());
+            _mintWrap(_msgSender());
         }
 
         emit MintpassesMinted(_msgSender(), mintpassNumber);
@@ -216,7 +222,7 @@ contract MintPassOptimized is
         return _TOKEN_URI;
     }
 
-    function __mint(address to) internal returns (uint256 currentId) {
+    function _mintWrap(address to) internal returns (uint256 currentId) {
         currentId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _mint(to, currentId);

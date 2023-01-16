@@ -1,4 +1,4 @@
 {
-    "detectors_to_run": "reentrancy-eth,reentrancy-no-eth,reentrancy-unlimited-gas",
-    "filter_paths": "contracts/mocks"
+    "detectors_to_run": "reentrancy-eth,reentrancy-no-eth,reentrancy-unlimited-gas,arbitrary-send-eth,missing-zero-check,solc-version,low-level-calls,naming-convention,immutable-states",
+    "filter_paths": "(helpers/|node_modules/)"
 }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
 abstract contract RoyaltySpliterStatic {
     struct Receiver {
@@ -68,6 +68,7 @@ abstract contract RoyaltySpliterStatic {
     /* solhint-disable func-param-name-mixedcase */
     /* solhint-disable var-name-mixedcase */
     function _pay(address ETHreceiver, uint256 amount) internal {
+        //slither-disable-next-line low-level-calls
         (bool sent, ) = ETHreceiver.call{value: amount}("");
         require(sent, "Failed to send Ether");
     }

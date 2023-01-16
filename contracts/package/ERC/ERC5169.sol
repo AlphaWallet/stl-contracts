@@ -2,7 +2,7 @@
 /* AlphaWallet 2021 - 2022 */
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
 import "./IERC5169.sol";
 

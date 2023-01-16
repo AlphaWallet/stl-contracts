@@ -2,7 +2,7 @@
 /* AlphaWallet 2021 - 2022 */
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
 interface IERC5169 {
     /// @dev This event emits when the scriptURI is updated,

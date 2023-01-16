@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract OptimizedEnumerable is IERC721Enumerable, ERC721 {
     using Counters for Counters.Counter;
 
-    Counters.Counter public _tokenIdCounter;
+    Counters.Counter private _tokenIdCounter;
 
     // count burnt token number to calc totalSupply()
     uint256 private _burnt;
@@ -19,7 +19,12 @@ contract OptimizedEnumerable is IERC721Enumerable, ERC721 {
         string memory symbol_
     ) ERC721(name_, symbol_) {}
 
-    function _beforeTokenTransfer(address, address to, uint256) internal {
+    function _beforeTokenTransfer(
+        address,
+        address to,
+        uint256,
+        uint256
+    ) internal virtual override {
         if (to == address(0)) {
             _burnt++;
         }
@@ -48,7 +53,7 @@ contract OptimizedEnumerable is IERC721Enumerable, ERC721 {
 
         // Counter overflow is impossible as the loop breaks when uint256 i is equal to another uint256 numMintedSoFar.
         unchecked {
-            for (uint256 i = 1; i < numMinted; i++) {
+            for (uint256 i = 0; i < numMinted; i++) {
                 if (_exists(i) && (ownerOf(i) == owner)) {
                     if (tokenIdsIdx == index) {
                         return i;
@@ -65,7 +70,7 @@ contract OptimizedEnumerable is IERC721Enumerable, ERC721 {
     }
 
     function totalSupply() public view virtual override returns (uint256) {
-        return _tokenIdCounter.current() - _burnt - 1;
+        return _tokenIdCounter.current() - _burnt;
     }
 
     /**
@@ -82,7 +87,7 @@ contract OptimizedEnumerable is IERC721Enumerable, ERC721 {
 
         // Counter overflow is impossible as the loop breaks when uint256 i is equal to another uint256 numMintedSoFar.
         unchecked {
-            for (uint256 i = 1; i < numMintedSoFar; i++) {
+            for (uint256 i = 0; i < numMintedSoFar; i++) {
                 if (_exists(i)) {
                     if (tokenIdsIdx == index) {
                         return i;
@@ -95,5 +100,11 @@ contract OptimizedEnumerable is IERC721Enumerable, ERC721 {
         // Execution should never reach this point.
         assert(false);
         return 0;
+    }
+
+    function _mint(address to) internal {
+        uint newTokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        ERC721._mint(to, newTokenId);
     }
 }

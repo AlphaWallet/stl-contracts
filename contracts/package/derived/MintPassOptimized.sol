@@ -22,25 +22,25 @@ contract MintPassOptimized is
     using Address for address;
 
     using Counters for Counters.Counter;
-    mapping(uint256 => uint256) private mintedMAYC;
-    mapping(uint256 => uint256) private mintedBAYC;
 
-    address immutable BAYC;
-    address immutable MAYC;
-    address immutable DAPE;
-    address RoyaltyReceiver;
+    /* solhint-disable var-name-mixedcase */
+    address immutable _BAYC;
+    address immutable _MAYC;
+    address immutable _DAPE;
+    address _royaltyReceiver;
 
-    string constant _contractURI =
+    string constant _CONTRACT_URI =
         "https://niftytailor.com/contracts/mintpass.json";
-    string constant _tokenURI = "https://niftytailor.com/token/mintpass.json";
+    string constant _TOKEN_URI = "https://niftytailor.com/token/mintpass.json";
 
-    uint256 constant AllowedNumberOfMintpasses = 10;
-    uint256 constant MintPrice = (1 ether * 69) / 1000;
-    uint256 constant MaxPerAddress = 50;
-    uint256 constant MaxAllowed = 2500;
+    uint256 constant _ALLOWED_NUMBER_OF_MINTPASSES = 10;
+    uint256 constant _MINT_PRICE = (1 ether * 69) / 1000;
+    uint256 constant _MAX_PER_ADDRESS = 50;
+    uint256 constant _MAX_ALLOWED = 2500;
 
     Counters.Counter private _tokenIdCounter;
-    uint256 immutable mintStartTime;
+    /* solhint-disable var-name-mixedcase */
+    uint256 immutable _MINT_START_TIME;
 
     // count burnt token number to calc totalSupply()
     uint256 private _burnt;
@@ -55,23 +55,23 @@ contract MintPassOptimized is
     constructor(
         string memory name_,
         string memory symbol_,
-        address _bayc,
-        address _mayc,
-        address _dape,
-        address _rr,
-        uint256 _mintStartTime
+        address bayc_,
+        address mayc_,
+        address dape_,
+        address rr_,
+        uint256 mintStartTime_
     ) ERC721(name_, symbol_) Ownable() {
-        BAYC = _bayc;
-        MAYC = _mayc;
-        DAPE = _dape;
-        _setRoyaltyContract(_rr);
+        _BAYC = bayc_;
+        _MAYC = mayc_;
+        _DAPE = dape_;
+        _setRoyaltyContract(rr_);
 
         _tokenIdCounter.increment();
 
         // TODO update royalty value
         _setRoyalty(200); // 100 = 1%
 
-        mintStartTime = _mintStartTime;
+        _MINT_START_TIME = mintStartTime_;
     }
 
     // required to solve inheritance
@@ -101,7 +101,7 @@ contract MintPassOptimized is
     {
         require(_exists(tokenId), "Token doesnt exist.");
         // receiver = _getTokenOwner(tokenId);
-        receiver = RoyaltyReceiver;
+        receiver = _royaltyReceiver;
         royaltyAmount = (_getRoyalty() * salePrice) / 10000;
     }
 
@@ -112,7 +112,7 @@ contract MintPassOptimized is
     function _setRoyaltyContract(address newAddress) internal {
         require(newAddress.isContract(), "Only Contract allowed");
         emit RoyaltyContractUpdate(newAddress);
-        RoyaltyReceiver = newAddress;
+        _royaltyReceiver = newAddress;
     }
 
     function withdraw() public onlyOwner {
@@ -134,12 +134,13 @@ contract MintPassOptimized is
         return _mintedPerAddress[addr];
     }
 
-    function setMintedForAddress(address addr, uint value) internal {
+    // we can use it in derived contract
+    function _setMintedForAddress(address addr, uint value) internal {
         _mintedPerAddress[addr] = value;
     }
 
     function getMintStartTime() public view virtual returns (uint256) {
-        return mintStartTime;
+        return _MINT_START_TIME;
     }
 
     function mintMintPass(uint256 mintpassNumber) external payable {
@@ -152,28 +153,29 @@ contract MintPassOptimized is
         uint256 minted = _mintedPerAddress[_msgSender()];
 
         require(
-            getMintPrice().mul(mintpassNumber) == msg.value,
+            _getMintPrice().mul(mintpassNumber) == msg.value,
             "Ether value sent is not correct"
         );
 
         require(
-            MaxPerAddress >= (minted + mintpassNumber),
+            _MAX_PER_ADDRESS >= (minted + mintpassNumber),
             "Too much MintPasses requested"
         );
         require(
-            getMaxAllowed() >= (_tokenIdCounter.current() - 1 + mintpassNumber),
+            _getMaxAllowed() >=
+                (_tokenIdCounter.current() - 1 + mintpassNumber),
             "Limit reached"
         );
         // require( _isTokenOwner(erc721, tokenId), "Sender not an owner");
 
-        uint256 originsNumber = _getBalance(BAYC) + _getBalance(MAYC);
+        uint256 originsNumber = _getBalance(_BAYC) + _getBalance(_MAYC);
 
         require(
-            originsNumber * AllowedNumberOfMintpasses > minted,
+            originsNumber * _ALLOWED_NUMBER_OF_MINTPASSES > minted,
             "Not enough origins."
         );
         require(
-            originsNumber * AllowedNumberOfMintpasses - minted >=
+            originsNumber * _ALLOWED_NUMBER_OF_MINTPASSES - minted >=
                 mintpassNumber,
             "Not enough origins"
         );
@@ -188,7 +190,7 @@ contract MintPassOptimized is
     }
 
     function useToken(uint256 tokenId, address sender) external returns (bool) {
-        require(_msgSender() == DAPE, "Only Derived APE allowed");
+        require(_msgSender() == _DAPE, "Only Derived APE allowed");
         require(_exists(tokenId), "Non-existent token");
         require(ownerOf(tokenId) == sender, "Requested by Non-owner");
         _burnt++;
@@ -196,13 +198,13 @@ contract MintPassOptimized is
         return true;
     }
 
-    // function setDAPE( address _dape) external onlyOwner {
-    //     require (_dape != address(0), "Zero not allowed");
-    //     DAPE = _dape;
+    // function set_DAPE( address __dape) external onlyOwner {
+    //     require (__dape != address(0), "Zero not allowed");
+    //     _DAPE = __dape;
     // }
 
     function contractURI() public pure virtual returns (string memory) {
-        return _contractURI;
+        return _CONTRACT_URI;
     }
 
     function tokenURI(
@@ -213,7 +215,7 @@ contract MintPassOptimized is
             "ERC721Metadata: URI query for nonexistent token"
         );
 
-        return _tokenURI;
+        return _TOKEN_URI;
     }
 
     function __mint(address to) internal returns (uint256 currentId) {
@@ -284,11 +286,11 @@ contract MintPassOptimized is
         return 0;
     }
 
-    function getMintPrice() internal view virtual returns (uint) {
-        return MintPrice;
+    function _getMintPrice() internal view virtual returns (uint) {
+        return _MINT_PRICE;
     }
 
-    function getMaxAllowed() internal view virtual returns (uint) {
-        return MaxAllowed;
+    function _getMaxAllowed() internal view virtual returns (uint) {
+        return _MAX_ALLOWED;
     }
 }

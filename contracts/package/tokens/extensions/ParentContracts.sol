@@ -9,9 +9,9 @@ abstract contract ParentContracts {
     using Address for address;
 
     // save as array to be able to foreach parents
-    address[] private allowedParentsArray;
+    address[] private _allowedParentsArray;
 
-    mapping(address => uint) private allowedParents;
+    mapping(address => uint) private _allowedParents;
 
     event ParentAdded(address indexed newERC721);
 
@@ -19,7 +19,7 @@ abstract contract ParentContracts {
 
     // array of ERC721 contracts to be parents to mint derived NFT
     function getParents() public view virtual returns (address[] memory) {
-        return allowedParentsArray;
+        return _allowedParentsArray;
     }
 
     function addParent(address newContract) public {
@@ -42,13 +42,13 @@ abstract contract ParentContracts {
 
         // require(c.supportsInterface(type(IERC721).interfaceId), "Must be ERC721 contract");
 
-        require(allowedParents[newContract] == 0, "Already added");
-        allowedParentsArray.push(newContract);
-        allowedParents[newContract] = allowedParentsArray.length;
+        require(_allowedParents[newContract] == 0, "Already added");
+        _allowedParentsArray.push(newContract);
+        _allowedParents[newContract] = _allowedParentsArray.length;
         emit ParentAdded(newContract);
     }
 
-    function isAllowedParent(address _contract) internal view returns (bool) {
-        return allowedParents[_contract] > 0;
+    function _isAllowedParent(address _contract) internal view returns (bool) {
+        return _allowedParents[_contract] > 0;
     }
 }

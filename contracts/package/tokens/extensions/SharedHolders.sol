@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 abstract contract SharedHolders {
-    address[] sharedTokenHolders;
+    address[] _sharedTokenHolders;
 
     event SharedTokenHoldersUpdated(address[] newAddresses);
 
@@ -19,7 +19,7 @@ abstract contract SharedHolders {
         _authorizeSetSharedHolder(newAddresses);
 
         emit SharedTokenHoldersUpdated(newAddresses);
-        sharedTokenHolders = newAddresses;
+        _sharedTokenHolders = newAddresses;
     }
 
     function _isSharedHolderTokenOwner(
@@ -28,16 +28,16 @@ abstract contract SharedHolders {
     ) internal view returns (bool) {
         ERC721 t = ERC721(_contract);
         address nftOwner = t.ownerOf(tokenId);
-        uint length = sharedTokenHolders.length;
+        uint length = _sharedTokenHolders.length;
         for (uint i = 0; i < length; i++) {
-            if (sharedTokenHolders[i] == nftOwner) {
+            if (_sharedTokenHolders[i] == nftOwner) {
                 return true;
             }
         }
         return false;
     }
 
-    function hasSharedTokenHolders() internal view returns (bool) {
-        return sharedTokenHolders.length > 0;
+    function _hasSharedTokenHolders() internal view returns (bool) {
+        return _sharedTokenHolders.length > 0;
     }
 }

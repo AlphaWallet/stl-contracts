@@ -12,7 +12,7 @@ contract OptimizedEnumerableUpgradeable is
 {
     using Counters for Counters.Counter;
 
-    Counters.Counter public _tokenIdCounter;
+    Counters.Counter private _tokenIdCounter;
 
     // count burnt token number to calc totalSupply()
     uint256 private _burnt;

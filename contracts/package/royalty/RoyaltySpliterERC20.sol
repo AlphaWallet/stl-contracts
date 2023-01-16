@@ -17,15 +17,15 @@ abstract contract RoyaltySpliterERC20 is RoyaltySpliterStatic {
     );
 
     function withdrawERC20(address[] calldata contracts) external {
-        Receiver[] memory receivers = getReceivers();
+        Receiver[] memory receivers = _getReceivers();
 
         require(receivers.length > 0, "No receivers");
         for (uint i = 0; i < contracts.length; i++) {
-            payERC20(contracts[i], receivers);
+            _payERC20(contracts[i], receivers);
         }
     }
 
-    function payERC20(address erc20, Receiver[] memory receivers) internal {
+    function _payERC20(address erc20, Receiver[] memory receivers) internal {
         IERC20 erc20c = IERC20(erc20);
 
         // get this contract balance to withdraw

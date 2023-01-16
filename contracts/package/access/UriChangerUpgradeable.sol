@@ -8,7 +8,8 @@ abstract contract UriChangerUpgradeable is UriChangerBase {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    function _uriChangerInit(address _newUriChanger) internal {
+    //solhint-disable func-name-mixedcase */
+    function __UriChangerInit(address _newUriChanger) internal {
         _uriChangerOnlyInitializing();
         _updateUriChanger(_newUriChanger);
     }

@@ -92,4 +92,24 @@ describe("ERC20 extensions", function () {
 
     expect(await contract.isSharedHolderTokenOwner(contract.address, 0)).to.eq(true);
   });
+
+  it('set royalty info', async function () {
+
+    const { contract, user, user2, user3, owner } = await setup();
+
+    await expect(contract.connect(owner).mint(user.address)).to.emit(contract, "Transfer");
+
+    await expect(contract.connect(user).setRoyaltyPercentage(800)).to.revertedWith("Ownable: caller is not the owner");
+
+    await expect(contract.connect(owner).setRoyaltyPercentage(800)).to.emit(contract, "RoyaltyUpdated");
+
+    await expect(contract.connect(user).setRoyaltyContract(user.address)).to.revertedWith("Ownable: caller is not the owner");
+
+    await expect(contract.connect(owner).setRoyaltyContract(user.address)).to.emit(contract, "RoyaltyContractUpdated");
+
+    let royaltyValue = await contract.royaltyInfo(0, 10000);
+    expect(royaltyValue.receiver).to.eq(user.address);
+    expect(royaltyValue.royaltyAmount).to.eq(800);
+    
+  })
 });

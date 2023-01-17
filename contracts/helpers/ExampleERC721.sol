@@ -8,11 +8,14 @@ import "../package/tokens/extensions/ParentContracts.sol";
 import "../package/tokens/extensions/SharedHolders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../package/tokens/OptimizedEnumerable.sol";
+import "../package/royalty/ERC2981RoyaltyFull.sol";
 
-contract ExampleERC721 is Ownable, Minter, SharedHolders, ParentContracts, OptimizedEnumerable {
+contract ExampleERC721 is Ownable, ERC2981RoyaltyFull, Minter, SharedHolders, ParentContracts, OptimizedEnumerable {
     constructor(string memory name, string memory symbol) OptimizedEnumerable(name, symbol) {}
 
     function _authorizeAddParent(address newContract) internal override onlyOwner {}
+
+    function _authorizeSetRoyalty() internal override onlyOwner {}
 
     function _authorizeSetSharedHolder(address[] calldata newAddresses) internal override onlyOwner {}
 
@@ -24,6 +27,12 @@ contract ExampleERC721 is Ownable, Minter, SharedHolders, ParentContracts, Optim
     ) internal override(Minter, OptimizedEnumerable) {
         Minter._beforeTokenTransfer(from, to, tokenId, 1);
         OptimizedEnumerable._beforeTokenTransfer(from, to, tokenId, 1);
+    }
+
+    function _exists(
+        uint256 tokenId
+    ) internal view override(ERC2981RoyaltyFull, OptimizedEnumerable) returns (bool) {
+        return OptimizedEnumerable._exists(tokenId);
     }
 
     function mint(address to) public virtual {
@@ -38,5 +47,12 @@ contract ExampleERC721 is Ownable, Minter, SharedHolders, ParentContracts, Optim
 
     function isSharedHolderTokenOwner(address _contract, uint256 tokenId) public view returns (bool) {
         return _isSharedHolderTokenOwner(_contract, tokenId);
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(OptimizedEnumerable, DerivedERC2981Royalty) returns (bool) {
+        return
+            OptimizedEnumerable.supportsInterface(interfaceId) || DerivedERC2981Royalty.supportsInterface(interfaceId);
     }
 }

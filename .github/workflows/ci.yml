@@ -1,0 +1,98 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  NODE_VER: 16
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VER }}
+          cache: npm
+      - run: |
+          echo -n "Node version: "
+          node -v
+          echo -n "Npm version: "
+          npm -v
+          npm ci
+      - name: compile
+        run: |
+          npm run compile
+      - name: test
+        run: |
+          npm test
+
+  slither:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VER }}
+          cache: npm
+      - run: |
+          echo -n "Node version: "
+          node -v
+          echo -n "Npm version: "
+          npm -v
+          npm ci
+      - name: slither
+        id: slither
+        run: |
+          pip3 install slither-analyzer
+          echo -e 'slither result for ${{ github.sha }}:\n' > slither_report.md
+          # Add --no-fail-pedantic and wait for this issue resolved
+          # https://github.com/crytic/slither/issues/1609
+          slither --no-fail-pedantic --sarif results.sarif \
+            --checklist \
+            --markdown-root "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/" \
+            . >> slither_report.md
+      - name: Post SARIF findings in the pull request
+        uses: thollander/actions-comment-pull-request@v2
+        if: github.event_name == 'pull_request' && (success() || failure())
+        with:
+          filePath: "slither_report.md"
+      - uses: Ayrx/sarif_to_github_annotations@v0.2.2
+        if: success() || failure()
+        with:
+          sarif_file: results.sarif
+
+  solhint:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VER }}
+          cache: npm
+      - run: |
+          echo -n "Node version: "
+          node -v
+          echo -n "Npm version: "
+          npm -v
+          npm ci
+      - name: solhint
+        id: solhint
+        run: |
+          set -o pipefail
+          set +e
+          npx -y solhint --init
+          echo -e 'solhint result for ${{ github.sha }}:\n```' > solhint.md
+          npx -y solhint 'contracts/**/*.sol' | tee -a solhint.md
+          exit_code=$?
+          echo '```' >> solhint.md
+          exit ${exit_code}
+      - name: Comment PR for solhint
+        uses: thollander/actions-comment-pull-request@v2
+        if: github.event_name == 'pull_request' && (success() || failure())
+        with:
+          filePath: "solhint.md"

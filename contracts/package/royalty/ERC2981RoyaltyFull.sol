@@ -6,16 +6,18 @@ import "./DerivedERC2981Royalty.sol";
 
 // Max royalty value is 10000 (100%)
 abstract contract ERC2981RoyaltyFull is DerivedERC2981Royalty {
-    event RoyaltyContractUpdated( address indexed newAddress );
+    event RoyaltyContractUpdated(address indexed newAddress);
 
     address payable private _royaltyReceiver;
 
-    constructor (){
+    constructor() {
         _royaltyReceiver = payable(msg.sender);
     }
 
-    function royaltyInfo(uint256 tokenId, uint256 salePrice) external virtual override view
-    returns (address receiver, uint256 royaltyAmount) {
+    function royaltyInfo(
+        uint256 tokenId,
+        uint256 salePrice
+    ) external view virtual override returns (address receiver, uint256 royaltyAmount) {
         require(_exists(tokenId), "Token doesnt exist.");
         require(_royaltyReceiver != address(0), "Receiver didnt set");
         receiver = _royaltyReceiver;
@@ -24,14 +26,14 @@ abstract contract ERC2981RoyaltyFull is DerivedERC2981Royalty {
 
     function setRoyaltyPercentage(uint value) external {
         _authorizeSetRoyalty();
-        require(value < 100*100 , "Percentage more than 100%");
+        require(value < 100 * 100, "Percentage more than 100%");
         _setRoyalty(value);
     }
 
     function setRoyaltyContract(address payable newAddress) external {
         require(newAddress != address(0), "Address required");
         _authorizeSetRoyalty();
-        _setRoyaltyContract( newAddress );
+        _setRoyaltyContract(newAddress);
     }
 
     function _setRoyaltyContract(address payable newAddress) internal {

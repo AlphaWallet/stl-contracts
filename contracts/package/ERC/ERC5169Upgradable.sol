@@ -12,5 +12,5 @@ abstract contract ERC5169Upgradable is ERC5169 {
     // slither-disable-start unused-state
     // slither-disable-next-line naming-convention
     uint256[49] private __gap;
-    // slither-disable-start unused-state
+    // slither-disable-end unused-state
 }

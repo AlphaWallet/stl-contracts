@@ -93,8 +93,7 @@ describe("ERC20 extensions", function () {
     expect(await contract.isSharedHolderTokenOwner(contract.address, 0)).to.eq(true);
   });
 
-  it('set royalty info', async function () {
-
+  it("set royalty info", async function () {
     const { contract, user, user2, user3, owner } = await setup();
 
     await expect(contract.connect(owner).mint(user.address)).to.emit(contract, "Transfer");
@@ -110,6 +109,5 @@ describe("ERC20 extensions", function () {
     let royaltyValue = await contract.royaltyInfo(0, 10000);
     expect(royaltyValue.receiver).to.eq(user.address);
     expect(royaltyValue.royaltyAmount).to.eq(800);
-    
-  })
+  });
 });

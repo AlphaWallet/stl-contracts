@@ -29,9 +29,7 @@ contract ExampleERC721 is Ownable, ERC2981RoyaltyFull, Minter, SharedHolders, Pa
         OptimizedEnumerable._beforeTokenTransfer(from, to, tokenId, 1);
     }
 
-    function _exists(
-        uint256 tokenId
-    ) internal view override(ERC2981RoyaltyFull, OptimizedEnumerable) returns (bool) {
+    function _exists(uint256 tokenId) internal view override(ERC2981RoyaltyFull, OptimizedEnumerable) returns (bool) {
         return OptimizedEnumerable._exists(tokenId);
     }
 

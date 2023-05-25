@@ -151,7 +151,6 @@ describe("EAS verify", function () {
 		const EAS = await ethers.getContractFactory("EAS");
 		eas = await EAS.connect(_addr1).deploy(schemaRegistry.address);
 		await eas.deployed();
-		console.log("Eas contract deployed: ", eas.address);
 
 		const EASverify = await ethers.getContractFactory("EASverify");
 		easVerify = await EASverify.connect(_addr1).deploy();

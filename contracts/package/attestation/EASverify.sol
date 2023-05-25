@@ -19,9 +19,7 @@ contract EASverify is VerifyAttestation {
     using ECDSA for bytes32;
 
     bytes32 constant EIP712_DOMAIN_TYPE_HASH =
-        keccak256(
-            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-        );
+        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
     // add some time gap to avoid problems with clock sync
     uint constant timeGap = 20;
@@ -130,9 +128,7 @@ contract EASverify is VerifyAttestation {
         }
     }
 
-    function bytesToHex(
-        bytes memory buffer
-    ) public pure returns (string memory) {
+    function bytesToHex(bytes memory buffer) public pure returns (string memory) {
         // Fixed buffer size for hexadecimal convertion
         bytes memory converted = new bytes(buffer.length * 2);
 
@@ -170,21 +166,13 @@ contract EASverify is VerifyAttestation {
         (, decodeIndex, ) = decodeLength(attestation, hashIndex); // Ticket Data
 
         // ticket payload dimensions
-        (length, hashIndex, ) = decodeLength(attestation, decodeIndex); 
+        (length, hashIndex, ) = decodeLength(attestation, decodeIndex);
 
         // get only payload
-        bytes memory contentBlock = copyDataBlock(
-            attestation,
-            hashIndex,
-            length
-        ); 
+        bytes memory contentBlock = copyDataBlock(attestation, hashIndex, length);
 
         // get signature data
-        (, sigData, resultIndex) = decodeElementOffset(
-            attestation,
-            hashIndex + length,
-            1
-        );
+        (, sigData, resultIndex) = decodeElementOffset(attestation, hashIndex + length, 1);
 
         (
             payloadObjectData.schema,
@@ -194,10 +182,7 @@ contract EASverify is VerifyAttestation {
             payloadObjectData.revocable,
             payloadObjectData.refUID,
             payloadObjectData.data
-        ) = abi.decode(
-            contentBlock,
-            (bytes32, address, uint64, uint64, bool, bytes32, bytes)
-        );
+        ) = abi.decode(contentBlock, (bytes32, address, uint64, uint64, bool, bytes32, bytes));
 
         // get Domain Data object position
         (length, hashIndex, ) = decodeLength(attestation, resultIndex); //5D
@@ -208,12 +193,10 @@ contract EASverify is VerifyAttestation {
 
         activeByTimestamp = validateTicketTimestamps(payloadObjectData);
 
-        (
-            ticket.conferenceId,
-            ticket.ticketIdString,
-            ticket.ticketClass,
-            ticket.commitment
-        ) = abi.decode(payloadObjectData.data, (string, string, uint8, bytes));
+        (ticket.conferenceId, ticket.ticketIdString, ticket.ticketClass, ticket.commitment) = abi.decode(
+            payloadObjectData.data,
+            (string, string, uint8, bytes)
+        );
 
         DecodedDomainData memory domain;
         (domain.version, domain.verifyingContract, domain.chainId) = abi.decode(
@@ -225,28 +208,18 @@ contract EASverify is VerifyAttestation {
         signer = recoverEasSigner(payloadObjectData, sigData, domain);
 
         if (testRevoked) {
-            revoke = verifyEasRevoked(
-                payloadObjectData,
-                signer,
-                domain.verifyingContract
-            );
+            revoke = verifyEasRevoked(payloadObjectData, signer, domain.verifyingContract);
         }
     }
 
     function validateTicketTimestamps(
         CustomAttestationRequestData memory payloadObjectData
-    ) internal view returns (bool){
-        if (
-            payloadObjectData.time > 0 &&
-            payloadObjectData.time > (block.timestamp + timeGap)
-        ) {
+    ) internal view returns (bool) {
+        if (payloadObjectData.time > 0 && payloadObjectData.time > (block.timestamp + timeGap)) {
             // revert("Attestation not active yet");
             return false;
         }
-        if (
-            payloadObjectData.expirationTime > 0 &&
-            payloadObjectData.expirationTime < block.timestamp
-        ) {
+        if (payloadObjectData.expirationTime > 0 && payloadObjectData.expirationTime < block.timestamp) {
             // revert("Attestation expired");
             return false;
         }
@@ -285,17 +258,14 @@ contract EASverify is VerifyAttestation {
             testRevoked
         );
 
-        (
-            attestor,
-            subject,
-            commitment1,
-            decodeIndex,
-            attestationValid
-        ) = recoverSignedIdentifierAddress(attestation, decodeIndex);
+        (attestor, subject, commitment1, decodeIndex, attestationValid) = recoverSignedIdentifierAddress(
+            attestation,
+            decodeIndex
+        );
 
         (pok, ) = recoverPOK(attestation, decodeIndex);
 
-        if (attestationValid){ 
+        if (attestationValid) {
             // no need to check if revoke.time < currentTime because EAS revoke set current time when revoked
             if (revoke.time > 0 || !activeByTimestamp) {
                 attestationValid = false;

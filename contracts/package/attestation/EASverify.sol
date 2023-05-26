@@ -163,16 +163,18 @@ contract EASverify is VerifyAttestation {
         CustomAttestationRequestData memory payloadObjectData;
 
         // total ticket content start
-        (, decodeIndex, ) = decodeLength(attestation, hashIndex); // Ticket Data
+        (length, decodeIndex, ) = decodeLength(attestation, hashIndex); // Ticket Data
+
+        resultIndex = decodeIndex + length;
 
         // ticket payload dimensions
-        (length, hashIndex, ) = decodeLength(attestation, decodeIndex);
+        (length, decodeIndex, ) = decodeLength(attestation, decodeIndex);
 
         // get only payload
-        bytes memory contentBlock = copyDataBlock(attestation, hashIndex, length);
+        bytes memory contentBlock = copyDataBlock(attestation, decodeIndex, length);
 
         // get signature data
-        (, sigData, resultIndex) = decodeElementOffset(attestation, hashIndex + length, 1);
+        (, sigData, decodeIndex) = decodeElementOffset(attestation, decodeIndex + length, 1);
 
         (
             payloadObjectData.schema,
@@ -185,12 +187,14 @@ contract EASverify is VerifyAttestation {
         ) = abi.decode(contentBlock, (bytes32, address, uint64, uint64, bool, bytes32, bytes));
 
         // get Domain Data object position
-        (length, hashIndex, ) = decodeLength(attestation, resultIndex); //5D
+        (length, decodeIndex, ) = decodeLength(attestation, decodeIndex); //5D
+        if (resultIndex < (decodeIndex + length)){
+            revert("Eas Domain Data Missing");
+        }
 
         // get only payload of Domain Data
-        contentBlock = copyDataBlock(attestation, hashIndex, length); // ticket
-        resultIndex = hashIndex + length;
-
+        contentBlock = copyDataBlock(attestation, decodeIndex, length); // ticket
+        
         activeByTimestamp = validateTicketTimestamps(payloadObjectData);
 
         (ticket.conferenceId, ticket.ticketIdString, ticket.ticketClass, ticket.commitment) = abi.decode(

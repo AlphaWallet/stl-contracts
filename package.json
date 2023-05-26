@@ -5,16 +5,20 @@
   "scripts": {
     "compile": "hardhat compile",
     "coverage": "env COVERAGE=true hardhat coverage",
-    "lint": "npm run lint:js && npm run lint:sol",
+    "lint": "gts lint",
     "lint:fix": "npm run lint:js:fix && npm run lint:sol:fix",
     "lint:js": "prettier --loglevel warn --ignore-path .gitignore '**/*.{js,ts}' --check && eslint --ignore-path .gitignore .",
     "lint:js:fix": "prettier --loglevel warn --ignore-path .gitignore '**/*.{js,ts}' --write && eslint --ignore-path .gitignore . --fix",
     "lint:sol": "prettier --loglevel warn --ignore-path .gitignore '{contracts,test}/**/*.sol' --check && solhint '{contracts,test}/**/*.sol'",
     "lint:sol:fix": "prettier --loglevel warn --ignore-path .gitignore '{contracts,test}/**/*.sol' --write",
-    "clean": "hardhat clean && rimraf build contracts/build",
+    "clean": "gts clean",
     "test": "hardhat test",
     "gas-report": "env ENABLE_GAS_REPORT=true npm run test",
-    "slither": "npm run clean && slither ."
+    "slither": "npm run clean && slither .",
+    "fix": "gts fix",
+    "prepare": "npm.cmd run compile",
+    "pretest": "npm.cmd run compile",
+    "posttest": "npm.cmd run lint"
   },
   "repository": {
     "type": "git",
@@ -26,29 +30,18 @@
     "url": "https://github.com/AlphaWallet/stl-contracts/issues"
   },
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.2.2",
-    "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@openzeppelin/contracts": "^4.8.0",
     "@openzeppelin/contracts-upgradeable": "^4.8.0",
     "@openzeppelin/hardhat-upgrades": "^1.22.0",
     "@tokenscript/attestation": "^0.4.2",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^18.11.18",
-    "chai": "^4.3.7",
     "dotenv": "^16.0.3",
-    "eslint": "^8.30.0",
-    "eslint-config-prettier": "^8.5.0",
-    "ethereum-waffle": "^3.4.4",
-    "ethers": "^5.7.2",
-    "hardhat": "^2.9.1",
-    "hardhat-gas-reporter": "^1.0.9",
-    "mocha": "^10.2.0",
-    "prettier": "^2.8.1",
-    "prettier-plugin-solidity": "^1.1.0",
+    "gts": "^4.0.0",
     "solhint": "^3.3.6",
-    "solidity-coverage": "^0.8.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.4",
     "yargs": "^17.6.2"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "ethereum-waffle": "^3.4.4",
+    "@nomiclabs/hardhat-waffle": "^2.0.3"
   }
 }

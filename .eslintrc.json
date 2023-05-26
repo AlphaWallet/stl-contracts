@@ -1,0 +1,20 @@
+{
+  "extends": "./node_modules/gts/",
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "node/no-unpublished-require": "off",
+    "node/no-unpublished-import": "off",
+    "node/no-extraneous-require": [
+      "error",
+      {
+        "allowModules": ["hardhat", "hardhat-gas-reporter", "solidity-coverage"]
+      }
+    ],
+    "node/no-extraneous-import": [
+      "error",
+      {
+        "allowModules": ["chai", "@nomiclabs/hardhat-ethers"]
+      }
+    ]
+  }
+}

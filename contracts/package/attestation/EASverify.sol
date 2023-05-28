@@ -4,8 +4,9 @@ pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-import "./VerifyAttestation.sol";
-import "@ethereum-attestation-service/eas-contracts/contracts/eip712/EIP712Verifier.sol";
+import "./AsnDecode.sol";
+import "./Pok.sol";
+import "./IdAttest.sol";
 import "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 import "@ethereum-attestation-service/eas-contracts/contracts/EAS.sol";
 import "@ethereum-attestation-service/eas-contracts/contracts/SchemaRegistry.sol";
@@ -15,14 +16,14 @@ import "@ethereum-attestation-service/eas-contracts/contracts/SchemaRegistry.sol
  * the Metadata extension, but not including the Enumerable extension, which is available separately as
  * {ERC721Enumerable}.
  */
-contract EASverify is VerifyAttestation {
+contract EASverify is AsnDecode, Pok, IdAttest {
     using ECDSA for bytes32;
 
     bytes32 constant EIP712_DOMAIN_TYPE_HASH =
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
     // add some time gap to avoid problems with clock sync
-    uint constant timeGap = 20;
+    uint constant TIME_GAP = 20;
 
     string constant name = "EAS Attestation";
 
@@ -99,7 +100,7 @@ contract EASverify is VerifyAttestation {
 
     function recoverEasSigner(
         CustomAttestationRequestData memory data,
-        bytes memory _signature,
+        bytes memory signature,
         DecodedDomainData memory domainData
     ) public view returns (address) {
         // EIP721 domain type
@@ -109,13 +110,13 @@ contract EASverify is VerifyAttestation {
         bytes32 r;
         bytes32 s;
         uint8 v;
-        if (_signature.length != 65) {
+        if (signature.length != 65) {
             return address(0);
         }
         assembly {
-            r := mload(add(_signature, 32))
-            s := mload(add(_signature, 64))
-            v := byte(0, mload(add(_signature, 96)))
+            r := mload(add(signature, 32))
+            s := mload(add(signature, 64))
+            v := byte(0, mload(add(signature, 96)))
         }
         if (v < 27) {
             v += 27;
@@ -126,20 +127,6 @@ contract EASverify is VerifyAttestation {
             // verify
             return ecrecover(hash, v, r, s);
         }
-    }
-
-    function bytesToHex(bytes memory buffer) public pure returns (string memory) {
-        // Fixed buffer size for hexadecimal convertion
-        bytes memory converted = new bytes(buffer.length * 2);
-
-        bytes memory _base = "0123456789abcdef";
-
-        for (uint256 i = 0; i < buffer.length; i++) {
-            converted[i * 2] = _base[uint8(buffer[i]) / _base.length];
-            converted[i * 2 + 1] = _base[uint8(buffer[i]) % _base.length];
-        }
-
-        return string(abi.encodePacked("0x", converted));
     }
 
     function decodeEasTicketData(
@@ -188,13 +175,13 @@ contract EASverify is VerifyAttestation {
 
         // get Domain Data object position
         (length, decodeIndex, ) = decodeLength(attestation, decodeIndex); //5D
-        if (resultIndex < (decodeIndex + length)){
+        if (resultIndex < (decodeIndex + length)) {
             revert("Eas Domain Data Missing");
         }
 
         // get only payload of Domain Data
         contentBlock = copyDataBlock(attestation, decodeIndex, length); // ticket
-        
+
         activeByTimestamp = validateTicketTimestamps(payloadObjectData);
 
         (ticket.conferenceId, ticket.ticketIdString, ticket.ticketClass, ticket.commitment) = abi.decode(
@@ -219,7 +206,7 @@ contract EASverify is VerifyAttestation {
     function validateTicketTimestamps(
         CustomAttestationRequestData memory payloadObjectData
     ) internal view returns (bool) {
-        if (payloadObjectData.time > 0 && payloadObjectData.time > (block.timestamp + timeGap)) {
+        if (payloadObjectData.time > 0 && payloadObjectData.time > (block.timestamp + TIME_GAP)) {
             // revert("Attestation not active yet");
             return false;
         }

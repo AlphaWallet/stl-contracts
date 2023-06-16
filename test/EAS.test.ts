@@ -67,8 +67,10 @@ const issuerWalletTestnet = new ethers.Wallet(
 // will be replaced in tests
 let attestationManager = new EasTicketAttestation(
 	EAS_TICKET_SCHEMA,
-	EAS_CONFIG,
-	wallet
+	{
+		EASconfig:EAS_CONFIG,
+		signer:wallet
+	}
 );
 const pubKeyConfig = { "6": issuerPrivKey };
 
@@ -102,15 +104,20 @@ async function createEasAttestation(
 ) {
 	let localAttestationManager = new EasTicketAttestation(
 		EAS_TICKET_SCHEMA,
-		config,
-		issuerWallet
+		{
+			EASconfig:config,
+			signer: issuerWallet
+		}
 	);
 
 	let attestJson = await localAttestationManager.createEasAttestation(request, {
 		validity,
 	});
 
-	const easZkProof = new EasZkProof(EAS_TICKET_SCHEMA, config, issuerWallet);
+	// const easZkProof = new EasZkProof(EAS_TICKET_SCHEMA, config, issuerWallet);
+	const easZkProof = new EasZkProof(EAS_TICKET_SCHEMA, {
+		'31337': eas.address
+	});
 	// Generate identifier attestation
 	const idSecret = new AttestationCrypto().makeSecret();
 

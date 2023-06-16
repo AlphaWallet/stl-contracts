@@ -33,7 +33,7 @@ contract EASverify is AsnDecode, Pok, IdAttest {
             "Attest(bytes32 schema,address recipient,uint64 time,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data)"
         );
 
-    struct CustomAttestationRequestData {
+    struct AttestationCoreData {
         address recipient; // The recipient of the attestation.
         uint64 time; // The time when the attestation expires (Unix timestamp).
         uint64 expirationTime; // The time when the attestation expires (Unix timestamp).
@@ -63,7 +63,7 @@ contract EASverify is AsnDecode, Pok, IdAttest {
     }
 
     function hashTyped(
-        CustomAttestationRequestData memory data,
+        AttestationCoreData memory data,
         DecodedDomainData memory domainData
     ) public view returns (bytes32 hash) {
         if (domainData.chainId != block.chainid) {
@@ -99,7 +99,7 @@ contract EASverify is AsnDecode, Pok, IdAttest {
     }
 
     function recoverEasSigner(
-        CustomAttestationRequestData memory data,
+        AttestationCoreData memory data,
         bytes memory signature,
         DecodedDomainData memory domainData
     ) public view returns (address) {
@@ -147,7 +147,7 @@ contract EASverify is AsnDecode, Pok, IdAttest {
         uint256 length;
         uint256 decodeIndex;
         bytes memory sigData;
-        CustomAttestationRequestData memory payloadObjectData;
+        AttestationCoreData memory payloadObjectData;
 
         // total ticket content start
         (length, decodeIndex, ) = decodeLength(attestation, hashIndex); // Ticket Data
@@ -204,7 +204,7 @@ contract EASverify is AsnDecode, Pok, IdAttest {
     }
 
     function validateTicketTimestamps(
-        CustomAttestationRequestData memory payloadObjectData
+        AttestationCoreData memory payloadObjectData
     ) internal view returns (bool) {
         if (payloadObjectData.time > 0 && payloadObjectData.time > (block.timestamp + TIME_GAP)) {
             // revert("Attestation not active yet");
@@ -267,7 +267,7 @@ contract EASverify is AsnDecode, Pok, IdAttest {
     }
 
     function verifyEasRevoked(
-        CustomAttestationRequestData memory payloadObjectData,
+        AttestationCoreData memory payloadObjectData,
         address issuer,
         address verifyingContract
     ) internal view returns (RevokeData memory revoke) {

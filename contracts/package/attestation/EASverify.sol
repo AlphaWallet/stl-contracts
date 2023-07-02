@@ -34,18 +34,17 @@ contract EASverify is AsnDecode, Pok, IdAttest {
         );
 
     struct AttestationCoreData {
+        bytes32 schema; // The UID of the associated EAS schema
         address recipient; // The recipient of the attestation.
-        uint64 time; // The time when the attestation expires (Unix timestamp).
+        uint64 time; // The time when the attestation is valid from (Unix timestamp).
         uint64 expirationTime; // The time when the attestation expires (Unix timestamp).
         bool revocable; // Whether the attestation is revocable.
         bytes32 refUID; // The UID of the related attestation.
-        bytes data; // Custom attestation data.
-        uint256 value; // An explicit ETH amount to send to the resolver. This is important to prevent accidental user errors.
-        bytes32 schema;
+        bytes data; // The actual Schema data (eg eventId: 12345, ticketId: 6 etc)
     }
 
     struct EasTicketData {
-        string conferenceId;
+        string eventId;
         string ticketIdString;
         uint8 ticketClass;
         bytes commitment;
@@ -129,6 +128,21 @@ contract EASverify is AsnDecode, Pok, IdAttest {
         }
     }
 
+    function decodeAttestationData(
+        AttestationCoreData memory easAttestation
+    ) public pure returns (
+        string memory eventId, 
+        string memory ticketId, 
+        uint8 ticketClass, 
+        bytes memory commitment
+        ) 
+    {
+        (eventId, ticketId, ticketClass, commitment) = abi.decode(
+            easAttestation.data, 
+            (string, string, uint8, bytes)
+        );
+    }
+
     function decodeEasTicketData(
         bytes memory attestation,
         uint256 hashIndex,
@@ -184,7 +198,7 @@ contract EASverify is AsnDecode, Pok, IdAttest {
 
         activeByTimestamp = validateTicketTimestamps(payloadObjectData);
 
-        (ticket.conferenceId, ticket.ticketIdString, ticket.ticketClass, ticket.commitment) = abi.decode(
+        (ticket.eventId, ticket.ticketIdString, ticket.ticketClass, ticket.commitment) = abi.decode(
             payloadObjectData.data,
             (string, string, uint8, bytes)
         );

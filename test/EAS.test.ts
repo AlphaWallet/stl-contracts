@@ -34,7 +34,7 @@ const EAS_CONFIG = {
 
 const EAS_TICKET_SCHEMA = {
 	fields: [
-		{ name: "devconId", type: "string" },
+		{ name: "eventId", type: "string" },
 		{ name: "ticketIdString", type: "string" },
 		{ name: "ticketClass", type: "uint8" },
 		{ name: "commitment", type: "bytes", isCommitment: true },
@@ -75,7 +75,7 @@ let attestationManager = new EasTicketAttestation(
 const pubKeyConfig = { "6": issuerPrivKey };
 
 const ticketRequestData = {
-	devconId: "6",
+	eventId: "6",
 	ticketIdString: "12345",
 	ticketClass: 2,
 	commitment: email,
@@ -186,8 +186,8 @@ describe("EAS verify", function () {
 
 		// default responce data
 		expect(attestResponce.ticketIssuer).to.equal(issuerWalletTestnet.address);
-		expect(attestResponce.ticket.conferenceId).to.equal(
-			ticketRequestData.devconId
+		expect(attestResponce.ticket.eventId).to.equal(
+			ticketRequestData.eventId
 		);
 		expect(attestResponce.ticket.ticketIdString).to.equal(
 			ticketRequestData.ticketIdString

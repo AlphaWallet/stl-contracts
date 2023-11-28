@@ -1,24 +1,24 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.16;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/interfaces/IERC165.sol";
 
 // disable "is IERC721Enumerable" to avoid multiple methods override for OptimizedEnumerableUpgradeable
-abstract contract OptimizedEnumerableBase {
-    using Counters for Counters.Counter;
+abstract contract OptimizedEnumerableBase is IERC165 {
 
-    Counters.Counter private _tokenIdCounter;
+    uint private _tokenIdCounter;
 
     // count burnt token number to calc totalSupply()
     uint256 private _burnt;
 
     //slither-disable-next-line dead-code
-    function _beforeTokenTransfer(address, address to, uint256, uint256) internal virtual {
+    function _update(address to, uint256, address) internal virtual returns (address) {
         if (to == address(0)) {
             _burnt++;
-        }
+        } 
+        return address(0);
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
@@ -37,12 +37,12 @@ abstract contract OptimizedEnumerableBase {
     function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual returns (uint256) {
         require(index < balanceOf(owner), "Owner index out of bounds");
 
-        uint256 numMinted = _tokenIdCounter.current();
+        uint256 numMinted = _tokenIdCounter;
         uint256 tokenIdsIdx = 0;
 
         // Counter overflow is impossible as the loop breaks when uint256 i is equal to another uint256 numMintedSoFar.
         unchecked {
-            for (uint256 i = 0; i < numMinted; i++) {
+            for (uint256 i = 0; i < numMinted; i++) {   
                 if (_exists(i) && (ownerOf(i) == owner)) {
                     if (tokenIdsIdx == index) {
                         return i;
@@ -59,14 +59,14 @@ abstract contract OptimizedEnumerableBase {
     }
 
     function totalSupply() public view virtual returns (uint256) {
-        return _tokenIdCounter.current() - _burnt;
+        return _tokenIdCounter - _burnt;
     }
 
     /**
      * @dev See {IERC721Enumerable-tokenByIndex}.
      */
     function tokenByIndex(uint256 index) public view virtual returns (uint256) {
-        uint256 numMintedSoFar = _tokenIdCounter.current();
+        uint256 numMintedSoFar = _tokenIdCounter;
 
         require(index < totalSupply(), "Index out of bounds");
 
@@ -90,8 +90,8 @@ abstract contract OptimizedEnumerableBase {
     }
 
     function _prepareTokenId() internal returns (uint) {
-        uint newTokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
+        uint newTokenId = _tokenIdCounter;
+        _tokenIdCounter++;
         return newTokenId;
     }
 }

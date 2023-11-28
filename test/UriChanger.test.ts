@@ -25,7 +25,7 @@ describe("UriChanger", () => {
   it("updateUriChanger", async () => {
     const { contract, user, user2, owner } = await setup();
     expect(await contract.getValue()).to.be.equal(1);
-    await expect(contract.connect(user).updateUriChanger(user2.address)).to.revertedWith("Ownable: caller is not the owner");
+    await expect(contract.connect(user).updateUriChanger(user2.address)).to.revertedWith('OwnableUnauthorizedAccount("'+user.address+'")');
 
     await expect(contract.connect(owner).updateUriChanger(ethers.constants.AddressZero)).to.revertedWith("UriChanger: Address required");
 

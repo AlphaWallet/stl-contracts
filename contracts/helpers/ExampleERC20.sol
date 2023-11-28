@@ -2,8 +2,11 @@
 
 pragma solidity ^0.8.16;
 
-import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract ExampleERC20 is ERC20PresetMinterPauser {
-    constructor(string memory name, string memory symbol) ERC20PresetMinterPauser(name, symbol) {}
+contract ExampleERC20 is ERC20 {
+    constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
+    function mint( address to, uint amount) public {
+        _mint(to, amount);
+    }
 }

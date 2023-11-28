@@ -1,19 +1,18 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.16;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./OptimizedEnumerableBase.sol";
 
 contract OptimizedEnumerable is OptimizedEnumerableBase, ERC721 {
-    function _beforeTokenTransfer(
-        address from,
+    function _update(
         address to,
         uint256 tokenId,
-        uint256 batchSize
-    ) internal virtual override(OptimizedEnumerableBase, ERC721) {
-        OptimizedEnumerableBase._beforeTokenTransfer(from, to, tokenId, batchSize);
-        ERC721._beforeTokenTransfer(from, to, tokenId, batchSize);
+        address auth
+    ) internal virtual override(OptimizedEnumerableBase, ERC721) returns (address) {
+        OptimizedEnumerableBase._update(to, tokenId, auth);
+        return ERC721._update( to, tokenId, auth);
     }
 
     function balanceOf(
@@ -25,11 +24,11 @@ contract OptimizedEnumerable is OptimizedEnumerableBase, ERC721 {
     function ownerOf(
         uint256 tokenId
     ) public view virtual override(OptimizedEnumerableBase, ERC721) returns (address owner) {
-        return ERC721.ownerOf(tokenId);
+        return ERC721._ownerOf(tokenId);
     }
 
-    function _exists(uint256 tokenId) internal view virtual override(OptimizedEnumerableBase, ERC721) returns (bool) {
-        return ERC721._exists(tokenId);
+    function _exists(uint256 tokenId) internal view virtual override returns (bool) {
+        return ownerOf(tokenId) != address(0);
     }
 
     function supportsInterface(

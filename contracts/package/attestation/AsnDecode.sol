@@ -1,8 +1,8 @@
+// SPDX-License-Identifier: MIT
 /* Attestation decode and validation */
 /* AlphaWallet 2021 - 2022 */
-// SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 pragma experimental ABIEncoderV2;
 
 contract AsnDecode {

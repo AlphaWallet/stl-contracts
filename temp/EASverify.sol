@@ -25,7 +25,7 @@ contract EASverify is AsnDecode, Pok, IdAttest {
     // add some time gap to avoid problems with clock sync
     uint constant TIME_GAP = 20;
 
-    string constant name = "EAS Attestation";
+    string constant _ATTESTATION_NAME = "EAS Attestation";
 
     // EAS lib hardcoded schema, be carefull if you are going to change it
     bytes32 constant ATTEST_TYPEHASH =
@@ -75,7 +75,7 @@ contract EASverify is AsnDecode, Pok, IdAttest {
                 keccak256(
                     abi.encode(
                         EIP712_DOMAIN_TYPE_HASH,
-                        keccak256(abi.encodePacked(name)),
+                        keccak256(abi.encodePacked(_ATTESTATION_NAME)),
                         keccak256(abi.encodePacked(domainData.version)),
                         domainData.chainId,
                         domainData.verifyingContract

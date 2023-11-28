@@ -6,15 +6,14 @@ import "../package/access/UriChangerUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract ExampleUriChangerUpgradeable is OwnableUpgradeable, UriChangerUpgradeable, UUPSUpgradeable {
+contract ExampleUriChangerUpgradeable is OwnableUpgradeable, UriChangerUpgradeable {
     uint public val;
 
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
     function initialize() public initializer {
-        __UUPSUpgradeable_init();
-        __Ownable_init();
+        __Ownable_init(msg.sender);
         __UriChangerInit(msg.sender);
         val = 1;
     }
@@ -22,8 +21,6 @@ contract ExampleUriChangerUpgradeable is OwnableUpgradeable, UriChangerUpgradeab
     function _uriChangerOnlyInitializing() internal override onlyInitializing {}
 
     function _authorizeUpdateUriChanger(address newAddress) internal override onlyOwner {}
-
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     function setValue(uint _val) public onlyUriChanger {
         val = _val;

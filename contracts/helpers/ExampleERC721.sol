@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.16;
+pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import "../package/tokens/extensions/Minter.sol";
 import "../package/tokens/extensions/ParentContracts.sol";
 import "../package/tokens/extensions/SharedHolders.sol";
@@ -11,7 +10,7 @@ import "../package/tokens/OptimizedEnumerable.sol";
 import "../package/royalty/ERC2981RoyaltyFull.sol";
 
 contract ExampleERC721 is Ownable, ERC2981RoyaltyFull, Minter, SharedHolders, ParentContracts, OptimizedEnumerable {
-    constructor(string memory name, string memory symbol) OptimizedEnumerable(name, symbol) {}
+    constructor(string memory name, string memory symbol) OptimizedEnumerable(name, symbol) Ownable(msg.sender) {}
 
     function _authorizeAddParent(address newContract) internal override onlyOwner {}
 
@@ -19,14 +18,19 @@ contract ExampleERC721 is Ownable, ERC2981RoyaltyFull, Minter, SharedHolders, Pa
 
     function _authorizeSetSharedHolder(address[] calldata newAddresses) internal override onlyOwner {}
 
-    function _beforeTokenTransfer(
-        address from,
+    function _update(
         address to,
         uint256 tokenId,
-        uint256
-    ) internal override(Minter, OptimizedEnumerable) {
-        Minter._beforeTokenTransfer(from, to, tokenId, 1);
-        OptimizedEnumerable._beforeTokenTransfer(from, to, tokenId, 1);
+        address auth
+    ) internal override(Minter, OptimizedEnumerable) returns (address) {
+        Minter._update(to, tokenId, auth);
+        return OptimizedEnumerable._update(to, tokenId, auth);
+    }
+
+    function _ownerOf(
+        uint256 tokenId
+    ) internal override(Minter, ERC721) view returns (address) {
+        return ERC721._ownerOf(tokenId);
     }
 
     function _exists(uint256 tokenId) internal view override(ERC2981RoyaltyFull, OptimizedEnumerable) returns (bool) {
@@ -39,7 +43,6 @@ contract ExampleERC721 is Ownable, ERC2981RoyaltyFull, Minter, SharedHolders, Pa
 
     function burn(uint256 tokenId) public virtual {
         //solhint-disable-next-line max-line-length
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not token owner or approved");
         _burn(tokenId);
     }
 

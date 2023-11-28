@@ -11,7 +11,7 @@ contract ExampleUriChanger is Ownable, UriChanger {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    constructor() UriChanger(msg.sender) {}
+    constructor() UriChanger(msg.sender) Ownable(msg.sender) {}
 
     function _authorizeUpdateUriChanger(address newAddress) internal override onlyOwner {}
 

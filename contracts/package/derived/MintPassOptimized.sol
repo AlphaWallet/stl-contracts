@@ -4,19 +4,16 @@ pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 
 import "@openzeppelin/contracts/utils/Address.sol";
 
 import "../royalty/DerivedERC2981Royalty.sol";
 
 contract MintPassOptimized is ERC721, Ownable, DerivedERC2981Royalty, IERC721Enumerable {
-    using SafeMath for uint256;
+    using Math for uint256;
     using Address for address;
-
-    using Counters for Counters.Counter;
 
     /* solhint-disable var-name-mixedcase */
     // slither-disable-start naming-convention
@@ -34,7 +31,7 @@ contract MintPassOptimized is ERC721, Ownable, DerivedERC2981Royalty, IERC721Enu
     uint256 constant _MAX_PER_ADDRESS = 50;
     uint256 constant _MAX_ALLOWED = 2500;
 
-    Counters.Counter private _tokenIdCounter;
+    uint private _tokenIdCounter;
     /* solhint-disable var-name-mixedcase */
     //slither-disable-next-line naming-convention
     uint256 immutable _MINT_START_TIME;
@@ -56,19 +53,33 @@ contract MintPassOptimized is ERC721, Ownable, DerivedERC2981Royalty, IERC721Enu
         address dape_,
         address rr_,
         uint256 mintStartTime_
-    ) ERC721(name_, symbol_) Ownable() {
+    ) ERC721(name_, symbol_) Ownable(msg.sender) {
         require(bayc_ != address(0) && mayc_ != address(0) && dape_ != address(0), "Contract required");
         _BAYC = bayc_;
         _MAYC = mayc_;
         _DAPE = dape_;
         _setRoyaltyContract(rr_);
 
-        _tokenIdCounter.increment();
+        _tokenIdCounter++;
 
         // TODO update royalty value
         _setRoyalty(200); // 100 = 1%
 
         _MINT_START_TIME = mintStartTime_;
+    }
+
+    function isContract(address _address) public view returns (bool) {
+        // address(..).code.size
+        // return account.code.length > 0;
+        uint32 size;
+        assembly { 
+            size := extcodesize(_address) 
+        }
+        return size > 0;
+    }
+
+    function _exists(uint tokenId) internal view returns(bool){
+        return ownerOf(tokenId) != address(0);
     }
 
     // required to solve inheritance
@@ -93,7 +104,7 @@ contract MintPassOptimized is ERC721, Ownable, DerivedERC2981Royalty, IERC721Enu
     }
 
     function _setRoyaltyContract(address newAddress) internal {
-        require(newAddress.isContract(), "Only Contract allowed");
+        require(isContract(newAddress), "Only Contract allowed");
         emit RoyaltyContractUpdate(newAddress);
         _royaltyReceiver = newAddress;
     }
@@ -111,7 +122,7 @@ contract MintPassOptimized is ERC721, Ownable, DerivedERC2981Royalty, IERC721Enu
     }
 
     function mintedTotal() public view returns (uint256) {
-        return _tokenIdCounter.current() - 1;
+        return _tokenIdCounter - 1;
     }
 
     function mintedForAddress(address addr) public view returns (uint256) {
@@ -136,11 +147,12 @@ contract MintPassOptimized is ERC721, Ownable, DerivedERC2981Royalty, IERC721Enu
     function _mintFor(uint256 mintpassNumber) internal virtual {
         // uint256 currentBalance = ERC721Upgradeable.balanceOf(_msgSender());
         uint256 minted = _mintedPerAddress[_msgSender()];
-
-        require(_getMintPrice().mul(mintpassNumber) == msg.value, "Ether value sent is not correct");
+        (bool ok, uint res) = _getMintPrice().tryMul(mintpassNumber);
+        require(ok, "Operation result overflows UINT256");
+        require(res == msg.value, "Ether value sent is not correct");
 
         require(_MAX_PER_ADDRESS >= (minted + mintpassNumber), "Too much MintPasses requested");
-        require(_getMaxAllowed() >= (_tokenIdCounter.current() - 1 + mintpassNumber), "Limit reached");
+        require(_getMaxAllowed() >= (_tokenIdCounter - 1 + mintpassNumber), "Limit reached");
         // require( _isTokenOwner(erc721, tokenId), "Sender not an owner");
 
         uint256 originsNumber = _getBalance(_BAYC) + _getBalance(_MAYC);
@@ -182,8 +194,8 @@ contract MintPassOptimized is ERC721, Ownable, DerivedERC2981Royalty, IERC721Enu
     }
 
     function _mintWrap(address to) internal returns (uint256 currentId) {
-        currentId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
+        currentId = _tokenIdCounter;
+        _tokenIdCounter++;
         _mint(to, currentId);
     }
 
@@ -193,13 +205,13 @@ contract MintPassOptimized is ERC721, Ownable, DerivedERC2981Royalty, IERC721Enu
     function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
         require(index < balanceOf(owner), "MP: owner index out of bounds");
 
-        uint256 numMintedSoFar = _tokenIdCounter.current();
+        uint256 numMintedSoFar = _tokenIdCounter;
         uint256 tokenIdsIdx = 0;
 
         // Counter overflow is impossible as the loop breaks when uint256 i is equal to another uint256 numMintedSoFar.
         unchecked {
             for (uint256 i = 1; i < numMintedSoFar; i++) {
-                if (_exists(i) && (ownerOf(i) == owner)) {
+                if (ownerOf(i) == owner) {
                     if (tokenIdsIdx == index) {
                         return i;
                     }
@@ -215,14 +227,14 @@ contract MintPassOptimized is ERC721, Ownable, DerivedERC2981Royalty, IERC721Enu
     }
 
     function totalSupply() public view virtual override returns (uint256) {
-        return _tokenIdCounter.current() - _burnt - 1;
+        return _tokenIdCounter - _burnt - 1;
     }
 
     /**
      * @dev See {IERC721Enumerable-tokenByIndex}.
      */
     function tokenByIndex(uint256 index) public view virtual override returns (uint256) {
-        uint256 numMintedSoFar = _tokenIdCounter.current();
+        uint256 numMintedSoFar = _tokenIdCounter;
 
         require(index < totalSupply(), "MP: index out of bounds");
         uint256 tokenIdsIdx = 0;

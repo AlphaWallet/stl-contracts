@@ -9,9 +9,7 @@ describe("UriChangerUpgradeable", () => {
 
     const ExampleUriChangerFactory = (await ethers.getContractFactory("ExampleUriChangerUpgradeable")).connect(owner);
 
-    let contract = await upgrades.deployProxy(ExampleUriChangerFactory, [], {
-      kind: "uups",
-    });
+    let contract = await upgrades.deployProxy(ExampleUriChangerFactory, []);
     await contract.deployed();
 
     return { owner, user, user2, contract };
@@ -30,7 +28,7 @@ describe("UriChangerUpgradeable", () => {
   it("updateUriChanger", async () => {
     const { contract, user, user2, owner } = await setup();
     expect(await contract.getValue()).to.be.equal(1);
-    await expect(contract.connect(user).updateUriChanger(user2.address)).to.revertedWith("Ownable: caller is not the owner");
+    await expect(contract.connect(user).updateUriChanger(user2.address)).to.revertedWith('OwnableUnauthorizedAccount("'+user.address+'")');
 
     await expect(contract.connect(owner).updateUriChanger(ethers.constants.AddressZero)).to.revertedWith("UriChanger: Address required");
 

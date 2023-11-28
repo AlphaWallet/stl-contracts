@@ -36,7 +36,7 @@ describe("ERC20 extensions", function () {
     const mockERC721 = await waffle.deployMockContract(owner, SampleERC721Json.abi);
     await mockERC721.mock.supportsInterface.returns(false);
     await expect(contract.connect(owner).addParent(mockERC721.address)).to.revertedWith("Must be ERC721 contract");
-    await expect(contract.connect(user2).addParent(mockERC721.address)).to.revertedWith("Ownable: caller is not the owner");
+    await expect(contract.connect(user2).addParent(mockERC721.address)).to.revertedWith('OwnableUnauthorizedAccount("'+user2.address+'")');
 
     await mockERC721.mock.supportsInterface.returns(true);
     await expect(contract.connect(owner).addParent(mockERC721.address)).to.emit(contract, "ParentAdded");
@@ -98,11 +98,11 @@ describe("ERC20 extensions", function () {
 
     await expect(contract.connect(owner).mint(user.address)).to.emit(contract, "Transfer");
 
-    await expect(contract.connect(user).setRoyaltyPercentage(800)).to.revertedWith("Ownable: caller is not the owner");
+    await expect(contract.connect(user).setRoyaltyPercentage(800)).to.revertedWith('OwnableUnauthorizedAccount("'+user.address+'")');
 
     await expect(contract.connect(owner).setRoyaltyPercentage(800)).to.emit(contract, "RoyaltyUpdated");
 
-    await expect(contract.connect(user).setRoyaltyContract(user.address)).to.revertedWith("Ownable: caller is not the owner");
+    await expect(contract.connect(user).setRoyaltyContract(user.address)).to.revertedWith('OwnableUnauthorizedAccount("'+user.address+'")');
 
     await expect(contract.connect(owner).setRoyaltyContract(user.address)).to.emit(contract, "RoyaltyContractUpdated");
 

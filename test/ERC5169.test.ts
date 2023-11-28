@@ -17,7 +17,7 @@ describe("ERC5169", () => {
 
     expect(await contract.scriptURI()).to.eql([]);
 
-    await expect(contract.connect(user).setScriptURI([])).to.revertedWith("Ownable: caller is not the owner");
+    await expect(contract.connect(user).setScriptURI([])).to.revertedWith('OwnableUnauthorizedAccount("'+user.address+'")');
 
     const scriptURI = ["uri1", "uri2", "uri3"];
 

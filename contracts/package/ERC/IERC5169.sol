@@ -14,6 +14,6 @@ interface IERC5169 {
     function scriptURI() external view returns (string[] memory);
 
     /// @notice Update the scriptURI
-    /// emits event ScriptUpdate(scriptURI memory newScriptURI);
+    /// emits event ScriptUpdate(string[])
     function setScriptURI(string[] memory) external;
 }

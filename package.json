@@ -1,6 +1,6 @@
 {
   "name": "stl-contracts",
-  "version": "2.2.0",
+  "version": "2.5.1",
   "description": "STL contracts",
   "scripts": {
     "compile": "hardhat compile",

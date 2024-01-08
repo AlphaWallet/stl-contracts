@@ -1,7 +1,7 @@
 const { ethers, waffle } = require("hardhat");
 import { expect } from "chai";
 
-const SampleERC721Json = require("../artifacts/contracts/package/tokens/OptimizedEnumerable.sol/OptimizedEnumerable.json");
+const SampleERC721Json = require("../artifacts/contracts/package/tokens/ERC721OptimizedEnumerable.sol/ERC721OptimizedEnumerable.json");
 
 describe("ERC20 extensions", function () {
   async function setup() {

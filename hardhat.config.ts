@@ -1,8 +1,10 @@
 import "@nomiclabs/hardhat-waffle";
 
-require("@openzeppelin/hardhat-upgrades");
+import "@nomicfoundation/hardhat-toolbox-viem";
+import "@openzeppelin/hardhat-upgrades";
+// import "@nomicfoundation/hardhat-chai-matchers";
 
-require("@nomiclabs/hardhat-ethers");
+import "@nomiclabs/hardhat-ethers";
 require("dotenv").config();
 
 /// ENVVAR
@@ -165,6 +167,7 @@ let config = {
       accounts: [`${PRIVATE_KEY}`],
     },
   },
+  /*
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
@@ -178,6 +181,7 @@ let config = {
       optimisticEthereum: `${OPTIMISM_API_KEY}`,
     },
   },
+  */
 };
 
 if (argv.gas) {

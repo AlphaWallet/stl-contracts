@@ -10,8 +10,6 @@ import '../royalty/DerivedERC2981Royalty.sol';
 import "@openzeppelin/contracts/access/extensions/AccessControlEnumerable.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
 
-import "hardhat/console.sol";
-
 contract ERC721STD is
 	ERC721Burnable,
 	ERC5169,
@@ -20,7 +18,7 @@ contract ERC721STD is
     ERC721URIStorage,
     ERC721Enumerable
 {
-    bytes32 private constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 private constant _MINTER_ROLE = keccak256("MINTER_ROLE");
 
     string public contractURI;
     string public baseURI;
@@ -28,7 +26,7 @@ contract ERC721STD is
     uint public royaltyPercentage;
     uint public nextTokenId;
 
-    event contractUriChanged(string newURI);
+    event ContractUriChanged(string newURI);
     event RoyaltyDataChanged(address addr, uint percentage);
 
     error TooHighRoyaltyPercentage();
@@ -36,14 +34,14 @@ contract ERC721STD is
 
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(MINTER_ROLE, msg.sender);
+        _grantRole(_MINTER_ROLE, msg.sender);
         _setRoyaltyData(msg.sender, 5 * 100);
     }
 
     function _authorizeSetScripts(string[] memory) internal virtual override onlyRole(DEFAULT_ADMIN_ROLE) {}
 
     // function isMinter(address _account) public view returns (bool) {
-    //     return hasRole(MINTER_ROLE, _account);
+    //     return hasRole(_MINTER_ROLE, _account);
     // }
 
     function owner() public view returns (address) {
@@ -76,7 +74,7 @@ contract ERC721STD is
 
     function setContractURI(string calldata newURI) external onlyRole(DEFAULT_ADMIN_ROLE){
         contractURI = newURI;
-        emit contractUriChanged(newURI);
+        emit ContractUriChanged(newURI);
     }
 
     function royaltyInfo(uint256 tokenId, uint256 salePrice) external view override
@@ -109,7 +107,7 @@ contract ERC721STD is
         baseURI = newBaseUri;
     }
 
-    function setTokenURI(uint256 tokenId, string memory _tokenURI) external onlyRole(MINTER_ROLE){
+    function setTokenURI(uint256 tokenId, string memory _tokenURI) external onlyRole(_MINTER_ROLE){
         _setTokenURI(tokenId, _tokenURI);
     }
 
@@ -121,7 +119,7 @@ contract ERC721STD is
     @param uri - can be empty string, minter can set the value later
     tokenId auto-increase
     */
-    function mint(address to, string memory uri) external onlyRole(MINTER_ROLE){
+    function mint(address to, string memory uri) external onlyRole(_MINTER_ROLE){
         _mint(to, nextTokenId);
         if (bytes(uri).length > 0){
             _setTokenURI(nextTokenId, uri);
@@ -130,6 +128,6 @@ contract ERC721STD is
     }
 
     // function contractURI() external pure returns (string memory){
-    //     return "https://resources.smarttokenlabs.com/contract/SLN.json";
+    //     return contractURI;
     // }
 }
